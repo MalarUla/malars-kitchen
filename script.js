@@ -1,7 +1,7 @@
 let foodPrices = {};
 
 async function loadFoodItems() {
-  const res = await fetch('YOUR_GOOGLE_SCRIPT_URL?type=food');
+  const res = await fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec');
   const data = await res.json();
   const foodItemSelect = document.getElementById('foodItem');
 
@@ -43,7 +43,7 @@ function submitOrder() {
     comments: document.getElementById('comments').value
   };
 
-  fetch('YOUR_GOOGLE_SCRIPT_URL?type=submit', {
+  fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec', {
     method: 'POST',
     body: JSON.stringify(payload)
   }).then(r => r.text()).then(alert);
