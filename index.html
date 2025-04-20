@@ -1,34 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malar's Kitchen Order Form</title>
-  <script src="script.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
 </head>
 <body>
-  <h2>Order Form - Malar's Kitchen</h2>
-  <form id="orderForm">
-    <label>Customer Name*</label><br>
-    <input type="text" id="customerName"><br>
+  <header>
+    <img src="images/Logo.png" alt="Malar's Kitchen Logo" class="logo">
+    <h1>Malar's Kitchen</h1>
+    <button id="toggleTheme">Toggle Theme</button>
+  </header>
 
-    <label>Contact Email (optional)</label><br>
-    <input type="email" id="contactEmail"><br>
+  <main>
+    <section class="form-section">
+      <h2>Place Your Order</h2>
+      <form id="orderForm">
+        <label for="customerName">Customer Name*</label>
+        <input type="text" id="customerName" required>
 
-    <label>Contact Phone*</label><br>
-    <input type="text" id="contactPhone"><br>
+        <label for="contactEmail">Contact Email (optional)</label>
+        <input type="email" id="contactEmail">
 
-    <label>Food Item*</label><br>
-    <select id="foodItem" onchange="calculatePrice()"></select><br>
+        <label for="contactPhone">Contact Phone*</label>
+        <input type="text" id="contactPhone" required>
 
-    <label>Quantity*</label><br>
-    <input type="number" id="quantity" value="1" min="1" onchange="calculatePrice()"><br>
+        <label for="foodItem">Food Item*</label>
+        <select id="foodItem" onchange="calculatePrice()" required>
+          <option value="">Select</option>
+        </select>
 
-    <label>Price</label><br>
-    <input type="text" id="price" disabled><br>
+        <label for="quantity">Quantity*</label>
+        <input type="number" id="quantity" value="1" min="1" onchange="calculatePrice()" required>
 
-    <label>Comments / Suggestions</label><br>
-    <textarea id="comments"></textarea><br><br>
+        <label for="price">Price</label>
+        <input type="text" id="price" disabled>
 
-    <button type="button" onclick="submitOrder()">Submit</button>
-  </form>
+        <label for="comments">Comments / Suggestions</label>
+        <textarea id="comments"></textarea>
+
+        <button type="button" onclick="submitOrder()">Submit</button>
+      </form>
+    </section>
+
+    <section class="menu-section">
+      <h2>Our Menu</h2>
+      <input type="text" id="menuFilter" placeholder="Search food...">
+      <div class="menu-cards" id="menuCards">
+        <!-- Cards will be generated dynamically if needed -->
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden">Order submitted successfully!</div>
+
+  <footer>
+    <p>&copy; 2025 Malar's Kitchen. All rights reserved.</p>
+  </footer>
 </body>
 </html>

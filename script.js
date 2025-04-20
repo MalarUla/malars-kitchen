@@ -5,8 +5,7 @@ async function loadFoodItems() {
   const data = await res.json();
   const foodItemSelect = document.getElementById('foodItem');
 
-  foodItemSelect.innerHTML = '<option value="">Select</option>'; // Add default option
-
+  foodItemSelect.innerHTML = '<option value="">Select</option>';
   data.forEach(item => {
     foodPrices[item.name] = item.price;
     const option = document.createElement('option');
@@ -15,9 +14,20 @@ async function loadFoodItems() {
     foodItemSelect.appendChild(option);
   });
 
+  renderMenuCards(data);
   calculatePrice();
 }
 
+function renderMenuCards(data) {
+  const container = document.getElementById('menuCards');
+  container.innerHTML = '';
+  data.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'menu-card';
+    card.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;
+    container.appendChild(card);
+  });
+}
 
 function calculatePrice() {
   const item = document.getElementById('foodItem').value;
@@ -26,19 +36,22 @@ function calculatePrice() {
   document.getElementById('price').value = price.toFixed(2);
 }
 
+
 function clearForm() {
-  document.getElementById('customerName').value = '';
-  document.getElementById('contactPhone').value = '';
-  document.getElementById('contactEmail').value = '';
-  document.getElementById('foodItem').value = '';
-  document.getElementById('quantity').value = '';
+  document.getElementById('orderForm').reset();
   document.getElementById('price').value = '';
-  document.getElementById('comments').value = '';
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function submitOrder() {
-  const name = document.getElementById('customerName').value;
-  const phone = document.getElementById('contactPhone').value;
+  const name = document.getElementById('customerName').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
   const item = document.getElementById('foodItem').value;
   const quantity = document.getElementById('quantity').value;
 
@@ -47,10 +60,8 @@ function submitOrder() {
     return;
   }
 
-  // Phone number validation: must be 10 digits
-  const phonePattern = /^\d{10}$/;
-  if (!phonePattern.test(phone)) {
-    alert('Please enter a valid 10-digit phone number.');
+  if (!/^[0-9]{10}$/.test(phone)) {
+    alert('Contact phone must be a 10-digit number.');
     return;
   }
 
@@ -67,14 +78,21 @@ function submitOrder() {
   fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec', {
     method: 'POST',
     body: JSON.stringify(payload)
-  })
-  .then(r => r.text())
-  .then(response => {
-    alert(response);
-
-    // Clear the form fields
+  }).then(r => r.text()).then(() => {
+    showToast('Order submitted successfully!');
     clearForm();
   });
 }
+
+document.getElementById('toggleTheme').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+});
+
+document.getElementById('menuFilter').addEventListener('input', function () {
+  const keyword = this.value.toLowerCase();
+  document.querySelectorAll('.menu-card').forEach(card => {
+    card.style.display = card.textContent.toLowerCase().includes(keyword) ? 'block' : 'none';
+  });
+});
 
 window.onload = loadFoodItems;
