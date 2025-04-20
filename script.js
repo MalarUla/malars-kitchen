@@ -36,7 +36,6 @@ function calculatePrice() {
   document.getElementById('price').value = price.toFixed(2);
 }
 
-
 function clearForm() {
   document.getElementById('orderForm').reset();
   document.getElementById('price').value = '';
