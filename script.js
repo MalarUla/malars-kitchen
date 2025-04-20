@@ -50,7 +50,17 @@ function submitOrder() {
   fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec', {
     method: 'POST',
     body: JSON.stringify(payload)
-  }).then(r => r.text()).then(alert);
+  })
+  .then(r => r.text())
+  .then(response => {
+    alert(response);
+
+    // Clear the form fields
+    document.getElementById('orderForm').reset();
+
+    // Clear calculated price field explicitly
+    document.getElementById('price').value = '';
+  });
 }
 
 window.onload = loadFoodItems;
