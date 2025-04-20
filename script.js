@@ -26,6 +26,16 @@ function calculatePrice() {
   document.getElementById('price').value = price.toFixed(2);
 }
 
+function clearForm() {
+  document.getElementById('customerName').value = '';
+  document.getElementById('contactPhone').value = '';
+  document.getElementById('contactEmail').value = '';
+  document.getElementById('foodItem').value = '';
+  document.getElementById('quantity').value = '';
+  document.getElementById('price').value = '';
+  document.getElementById('comments').value = '';
+}
+
 function submitOrder() {
   const name = document.getElementById('customerName').value;
   const phone = document.getElementById('contactPhone').value;
@@ -56,10 +66,7 @@ function submitOrder() {
     alert(response);
 
     // Clear the form fields
-    document.getElementById('orderForm').reset();
-
-    // Clear calculated price field explicitly
-    document.getElementById('price').value = '';
+    clearForm();
   });
 }
 
