@@ -1,45 +1,22 @@
 let foodPrices = {};
-let foodImages = {};
-
-
 
 async function loadFoodItems() {
   const res = await fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec');
   const data = await res.json();
-
   const foodItemSelect = document.getElementById('foodItem');
-  const menuContainer = document.getElementById('menu');
 
   foodItemSelect.innerHTML = '<option value="">Select</option>';
-  menuContainer.innerHTML = '';
-
   data.forEach(item => {
-    const nameKey = item.name.replace(/\s+/g, '_').toLowerCase();
     foodPrices[item.name] = item.price;
-    foodImages[item.name] = `images/${nameKey}.jpg`;
-
-    // Populate dropdown
     const option = document.createElement('option');
     option.value = item.name;
     option.text = item.name;
     foodItemSelect.appendChild(option);
-
-    // Create menu card
-    const card = document.createElement('div');
-    card.className = 'menu-card';
-    card.innerHTML = `
-      <img src="${foodImages[item.name]}" alt="${item.name}" class="menu-img" />
-      <div class="menu-info">
-        <h3>${item.name}</h3>
-        <p>₹${item.price}</p>
-      </div>
-    `;
-    menuContainer.appendChild(card);
   });
 
+  renderMenuCards(data);
   calculatePrice();
 }
-
 
 function renderMenuCards(data) {
   const container = document.getElementById('menuCards');

@@ -1,149 +1,131 @@
-// style.css
-
 :root {
-  --bg-color-light: #fefbf6;
-  --text-color-light: #2d2d2d;
-  --bg-color-dark: #1a1a1a;
-  --text-color-dark: #f0f0f0;
-  --accent-color: #b88b4a;
-  --card-bg-light: #ffffff;
-  --card-bg-dark: #2a2a2a;
+  --primary-color: #d94f4f;
+  --background-light: #fff6f0;
+  --background-dark: #1c1c1c;
+  --text-light: #fff;
+  --text-dark: #222;
+  --accent: #f8b195;
+  --border-radius: 12px;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  background-color: var(--bg-color-light);
-  color: var(--text-color-light);
-  transition: background 0.3s ease, color 0.3s ease;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--background-light);
+  color: var(--text-dark);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-body.dark {
-  background-color: var(--bg-color-dark);
-  color: var(--text-color-dark);
+.dark-mode {
+  background-color: var(--background-dark);
+  color: var(--text-light);
 }
 
 header {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background-color: var(--accent-color);
-  color: #fff;
 }
 
-header img {
+header .logo {
   height: 50px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-}
-
-.theme-toggle {
-  background: transparent;
-  border: 2px solid #fff;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  border-radius: 5px;
+  margin-right: 1rem;
 }
 
 main {
   padding: 2rem;
+  display: grid;
+  gap: 2rem;
 }
 
 form {
-  max-width: 600px;
-  margin: 0 auto 3rem;
-  background: var(--card-bg-light);
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-body.dark form {
-  background: var(--card-bg-dark);
-}
-
-label {
-  font-weight: bold;
-  display: block;
-  margin-top: 1rem;
-}
-
-input, select, textarea {
+form input, form select, form textarea {
   width: 100%;
   padding: 0.6rem;
-  margin-top: 0.3rem;
+  margin: 0.5rem 0 1rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   box-sizing: border-box;
 }
 
-button {
-  background-color: var(--accent-color);
+form button {
+  background-color: var(--primary-color);
   color: white;
+  padding: 0.75rem 1.5rem;
   border: none;
-  padding: 0.7rem 1.5rem;
-  margin-top: 1.5rem;
-  font-size: 1rem;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  border-radius: 5px;
+  font-size: 1rem;
 }
 
-.menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+form button:hover {
+  background-color: #c93a3a;
+}
+
+.menu-section {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+}
+
+.menu-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .menu-card {
-  background: var(--card-bg-light);
+  flex: 1 1 calc(33.333% - 1rem);
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: var(--border-radius);
   padding: 1rem;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-body.dark .menu-card {
-  background: var(--card-bg-dark);
-}
-
-.menu-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.menu-card h3 {
-  margin: 0.8rem 0 0.3rem;
-  font-size: 1.2rem;
-}
-
-.menu-card p {
-  margin: 0;
-  font-size: 1rem;
-  color: var(--accent-color);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
 }
 
 .toast {
   position: fixed;
   bottom: 1rem;
-  right: 1rem;
-  background-color: #4caf50;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #28a745;
   color: white;
-  padding: 1rem;
-  border-radius: 5px;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: opacity 0.3s ease;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
 }
 
 .toast.show {
   opacity: 1;
-  transform: translateY(0);
+  pointer-events: auto;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #eee;
+  margin-top: 2rem;
+}
+
+@media screen and (max-width: 768px) {
+  .menu-card {
+    flex: 1 1 100%;
+  }
+
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
 }
