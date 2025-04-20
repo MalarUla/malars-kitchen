@@ -5,6 +5,8 @@ async function loadFoodItems() {
   const data = await res.json();
   const foodItemSelect = document.getElementById('foodItem');
 
+  foodItemSelect.innerHTML = '<option value="">Select</option>'; // Add default option
+
   data.forEach(item => {
     foodPrices[item.name] = item.price;
     const option = document.createElement('option');
@@ -12,8 +14,10 @@ async function loadFoodItems() {
     option.text = item.name;
     foodItemSelect.appendChild(option);
   });
+
   calculatePrice();
 }
+
 
 function calculatePrice() {
   const item = document.getElementById('foodItem').value;
