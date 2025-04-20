@@ -47,6 +47,13 @@ function submitOrder() {
     return;
   }
 
+  // Phone number validation: must be 10 digits
+  const phonePattern = /^\d{10}$/;
+  if (!phonePattern.test(phone)) {
+    alert('Please enter a valid 10-digit phone number.');
+    return;
+  }
+
   const payload = {
     name,
     email: document.getElementById('contactEmail').value,
