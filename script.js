@@ -57,6 +57,7 @@ function submitOrder() {
   const phone = document.getElementById('contactPhone').value.trim();
   const item = document.getElementById('foodItem').value;
   const quantity = document.getElementById('quantity').value;
+  const email = document.getElementById('contactEmail').value.trim();
 
   if (!name || !phone || !item || !quantity) {
     showToast('Please fill all required fields.', 'error');
@@ -68,9 +69,14 @@ function submitOrder() {
     return;
   }
 
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address.', 'error');
+    return;
+  }
+
   const payload = {
     name,
-    email: document.getElementById('contactEmail').value,
+    email,
     phone,
     item,
     quantity,
