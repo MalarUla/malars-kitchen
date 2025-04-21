@@ -120,6 +120,14 @@ form button:hover {
   pointer-events: auto;
 }
 
+.toast.error {
+  background-color: #dc3545; /* red */
+}
+
+.toast.success {
+  background-color: #28a745; /* green */
+}
+
 footer {
   text-align: center;
   padding: 1rem;

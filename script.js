@@ -41,11 +41,15 @@ function clearForm() {
   document.getElementById('price').value = '';
 }
 
-function showToast(message) {
+function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');
   toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+
+  toast.className = `toast show ${type}`;
+
+  setTimeout(() => {
+    toast.className = 'toast hidden';
+  }, 3000);
 }
 
 function submitOrder() {
@@ -55,12 +59,12 @@ function submitOrder() {
   const quantity = document.getElementById('quantity').value;
 
   if (!name || !phone || !item || !quantity) {
-    alert('Please fill all required fields.');
+    showToast('Please fill all required fields.', 'error');
     return;
   }
 
   if (!/^[0-9]{10}$/.test(phone)) {
-    alert('Contact phone must be a 10-digit number.');
+    showToast('Contact phone must be a 10-digit number.', 'error');
     return;
   }
 
@@ -77,9 +81,18 @@ function submitOrder() {
   fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec', {
     method: 'POST',
     body: JSON.stringify(payload)
-  }).then(r => r.text()).then(() => {
-    showToast('Order submitted successfully!');
+  })
+  .then(r => {
+    if (!r.ok) throw new Error('Server responded with an error.');
+    return r.text();
+  })
+  .then(() => {
+    showToast('Order submitted successfully!', 'success');
     clearForm();
+  })
+  .catch(err => {
+    console.error(err);
+    showToast('Failed to submit order. Please try again.', 'error');
   });
 }
 
