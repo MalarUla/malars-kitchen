@@ -1,25 +1,21 @@
 let foodPrices = {};
 
 async function loadFoodItems() {
+  const res = await fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec');
+  const data = await res.json();
   const foodItemSelect = document.getElementById('foodItem');
-  foodItemSelect.innerHTML = '<option value="">Select</option>';
 
-  try {
-    const snapshot = await db.collection('FoodItems').get();
-    snapshot.forEach(doc => {
-      const item = doc.data();
-      foodPrices[item.name] = item.price;
-      const option = document.createElement('option');
-      option.value = item.name;
-      option.text = item.name;
-      foodItemSelect.appendChild(option);
-    });
-    renderMenuCards(snapshot.docs.map(doc => doc.data()));
-    calculatePrice();
-  } catch (error) {
-    console.error("Error fetching food items: ", error);
-    showToast('Failed to load menu. Please try again.', 'error');
-  }
+  foodItemSelect.innerHTML = '<option value="">Select</option>';
+  data.forEach(item => {
+    foodPrices[item.name] = item.price;
+    const option = document.createElement('option');
+    option.value = item.name;
+    option.text = item.name;
+    foodItemSelect.appendChild(option);
+  });
+
+  renderMenuCards(data);
+  calculatePrice();
 }
 
 function renderMenuCards(data) {
@@ -56,16 +52,13 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-
-async function submitOrder() {
+function submitOrder() {
   const name = document.getElementById('customerName').value.trim();
   const phone = document.getElementById('contactPhone').value.trim();
   const item = document.getElementById('foodItem').value;
-  const quantity = parseInt(document.getElementById('quantity').value);
+  const quantity = document.getElementById('quantity').value;
   const email = document.getElementById('contactEmail').value.trim();
-  const comments = document.getElementById('comments').value;
 
-  // Validate inputs
   if (!name || !phone || !item || !quantity) {
     showToast('Please fill all required fields.', 'error');
     return;
@@ -75,36 +68,39 @@ async function submitOrder() {
     showToast('Contact phone must be a 10-digit number.', 'error');
     return;
   }
-
+  
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showToast('Please enter a valid email address.', 'error');
     return;
   }
 
-  const price = quantity * (foodPrices[item] || 0);
+  const payload = {
+    name,
+    email,
+    phone,
+    item,
+    quantity,
+    price: document.getElementById('price').value,
+    comments: document.getElementById('comments').value
+  };
 
-  try {
-    await db.collection('Orders').add({
-      name,
-      phone,
-      email,
-      item,
-      quantity,
-      price,
-      comments,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
+  fetch('https://script.google.com/macros/s/AKfycbxgdlsUUuLDCWCJukv_B_aVY1caasSMaCEUievN9y_jgc2aM60or58bc10rHYA9hdrlfA/exec', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  })
+  .then(r => {
+    if (!r.ok) throw new Error('Server responded with an error.');
+    return r.text();
+  })
+  .then(() => {
     showToast('Order submitted successfully!', 'success');
-
-    // Optionally reset form fields
-    document.getElementById('orderForm').reset();
-  } catch (error) {
-    console.error('Error submitting order:', error);
-    showToast('Failed to submit order. Please try again later.', 'error');
-  }
+    clearForm();
+  })
+  .catch(err => {
+    console.error(err);
+    showToast('Failed to submit order. Please try again.', 'error');
+  });
 }
-
 
 document.getElementById('toggleTheme').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
