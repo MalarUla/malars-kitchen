@@ -2,23 +2,41 @@ let foodPrices = {};
 const db = firebase.firestore();
 
 function loadFoodItems() {
-  const foodList = document.getElementById("foodItem");
-  foodList.innerHTML = "";
+  const foodSelect = document.getElementById("foodItem");
+  const menuData = [];
+
+  foodSelect.innerHTML = `<option value="">Select</option>`;
+  foodPrices = {}; // Reset prices
 
   db.collection("fooditems")
     .get()
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const item = document.createElement("div");
-        item.textContent = `${data.name} - ₹${data.price}`;
-        foodList.appendChild(item);
+        const name = data.name;
+        const price = data.price;
+
+        // Populate dropdown
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = `${name} - ₹${price}`;
+        foodSelect.appendChild(option);
+
+        // Store in foodPrices map
+        foodPrices[name] = price;
+
+        // Push to menu list for rendering cards
+        menuData.push({ name, price });
       });
+
+      // Now render the menu cards
+      renderMenuCards(menuData);
     })
     .catch((error) => {
       console.error("Error fetching food items: ", error);
     });
 }
+
 
 function renderMenuCards(data) {
   const container = document.getElementById('menuCards');
