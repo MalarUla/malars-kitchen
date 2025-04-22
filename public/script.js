@@ -1,5 +1,4 @@
 let foodPrices = {};
-const db = firebase.firestore();
 
 function loadFoodItems() {
   console.log("✅ loadFoodItems() called");
