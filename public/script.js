@@ -36,10 +36,9 @@ function loadFoodItems() {
       renderMenuCards(menuData);
     })
     .catch((error) => {
-      console.error("Error fetching food items: ", error);
+      console.error("❌ Error fetching food items: ", error);
     });
 }
-
 
 function renderMenuCards(data) {
   console.log("✅ renderMenuCards() called with:", data);
@@ -76,7 +75,6 @@ function showToast(message, type = 'success') {
     toast.className = 'toast hidden';
   }, 3000);
 }
-
 
 async function submitOrder() {
   const name = document.getElementById('customerName').value.trim();
@@ -117,25 +115,28 @@ async function submitOrder() {
     });
 
     showToast('Order submitted successfully!', 'success');
-
-    // Optionally reset form fields
-    document.getElementById('orderForm').reset();
+    clearForm();
   } catch (error) {
-    console.error('Error submitting order:', error);
+    console.error('❌ Error submitting order:', error);
     showToast('Failed to submit order. Please try again later.', 'error');
   }
 }
 
+// ✅ Wait until everything (Firebase included) is loaded
+window.addEventListener('load', () => {
+  console.log("📦 Page fully loaded. Initializing app...");
+  loadFoodItems();
 
-document.getElementById('toggleTheme').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-});
+  // Setup theme toggle
+  document.getElementById('toggleTheme').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+  });
 
-document.getElementById('menuFilter').addEventListener('input', function () {
-  const keyword = this.value.toLowerCase();
-  document.querySelectorAll('.menu-card').forEach(card => {
-    card.style.display = card.textContent.toLowerCase().includes(keyword) ? 'block' : 'none';
+  // Filter menu items
+  document.getElementById('menuFilter').addEventListener('input', function () {
+    const keyword = this.value.toLowerCase();
+    document.querySelectorAll('.menu-card').forEach(card => {
+      card.style.display = card.textContent.toLowerCase().includes(keyword) ? 'block' : 'none';
+    });
   });
 });
-
-window.onload = loadFoodItems;
