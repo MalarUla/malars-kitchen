@@ -1,28 +1,49 @@
 let foodPrices = {};
+const db = firebase.firestore();
 
-async function loadFoodItems() {
-  const foodItemSelect = document.getElementById('foodItem');
-  foodItemSelect.innerHTML = '<option value="">Select</option>';
+function loadFoodItems() {
+  console.log("✅ loadFoodItems() called");
+  const foodSelect = document.getElementById("foodItem");
+  const menuData = [];
 
-  try {
-    const snapshot = await db.collection('FoodItems').get();
-    snapshot.forEach(doc => {
-      const item = doc.data();
-      foodPrices[item.name] = item.price;
-      const option = document.createElement('option');
-      option.value = item.name;
-      option.text = item.name;
-      foodItemSelect.appendChild(option);
+  foodSelect.innerHTML = `<option value="">Select</option>`;
+  foodPrices = {}; // Reset prices
+
+  db.collection("fooditems")
+    .get()
+    .then((querySnapshot) => {
+      console.log("✅ Firebase call successful. Documents found:", querySnapshot.size);
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        console.log("🔹 Food item fetched:", data);
+        const name = data.name;
+        const price = data.price;
+
+        // Populate dropdown
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = `${name} - ₹${price}`;
+        foodSelect.appendChild(option);
+
+        // Store in foodPrices map
+        foodPrices[name] = price;
+
+        // Push to menu list for rendering cards
+        menuData.push({ name, price });
+      });
+      console.log("✅ Completed food item population. Menu data:", menuData);
+
+      // Now render the menu cards
+      renderMenuCards(menuData);
+    })
+    .catch((error) => {
+      console.error("Error fetching food items: ", error);
     });
-    renderMenuCards(snapshot.docs.map(doc => doc.data()));
-    calculatePrice();
-  } catch (error) {
-    console.error("Error fetching food items: ", error);
-    showToast('Failed to load menu. Please try again.', 'error');
-  }
 }
 
+
 function renderMenuCards(data) {
+  console.log("✅ renderMenuCards() called with:", data);
   const container = document.getElementById('menuCards');
   container.innerHTML = '';
   data.forEach(item => {
@@ -30,6 +51,7 @@ function renderMenuCards(data) {
     card.className = 'menu-card';
     card.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;
     container.appendChild(card);
+    console.log("🔹 Menu card added:", item.name);
   });
 }
 
