@@ -27,14 +27,16 @@
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
-
-    // Check Firebase initialization
-    console.log("Firebase initialized: ", firebase.apps.length > 0 ? "Yes" : "No");
 
     // Initialize Firestore and make it available globally
     const db = firebase.firestore();
     window.db = db;
+
+    firebase.analytics();
+    
+    // Check Firebase initialization
+    console.log("Firebase initialized: ", firebase.apps.length > 0 ? "Yes" : "No");
+
   </script>
 
   <!-- Your app's logic -->

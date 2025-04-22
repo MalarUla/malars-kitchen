@@ -122,10 +122,16 @@ async function submitOrder() {
   }
 }
 
-// ✅ Wait until everything (Firebase included) is loaded
 window.addEventListener('load', () => {
   console.log("📦 Page fully loaded. Initializing app...");
-  loadFoodItems();
+  
+  // Check if Firestore is available before calling loadFoodItems
+  if (window.db) {
+    console.log("✅ Firebase and Firestore are ready.");
+    loadFoodItems(); // Proceed with loading food items
+  } else {
+    console.error("❌ Firebase or Firestore not initialized.");
+  }
 
   // Setup theme toggle
   document.getElementById('toggleTheme').addEventListener('click', () => {
