@@ -2,6 +2,7 @@ let foodPrices = {};
 const db = firebase.firestore();
 
 function loadFoodItems() {
+  console.log("✅ loadFoodItems() called");
   const foodSelect = document.getElementById("foodItem");
   const menuData = [];
 
@@ -11,8 +12,10 @@ function loadFoodItems() {
   db.collection("fooditems")
     .get()
     .then((querySnapshot) => {
+      console.log("✅ Firebase call successful. Documents found:", querySnapshot.size);
       querySnapshot.forEach((doc) => {
         const data = doc.data();
+        console.log("🔹 Food item fetched:", data);
         const name = data.name;
         const price = data.price;
 
@@ -28,6 +31,7 @@ function loadFoodItems() {
         // Push to menu list for rendering cards
         menuData.push({ name, price });
       });
+      console.log("✅ Completed food item population. Menu data:", menuData);
 
       // Now render the menu cards
       renderMenuCards(menuData);
@@ -39,6 +43,7 @@ function loadFoodItems() {
 
 
 function renderMenuCards(data) {
+  console.log("✅ renderMenuCards() called with:", data);
   const container = document.getElementById('menuCards');
   container.innerHTML = '';
   data.forEach(item => {
@@ -46,6 +51,7 @@ function renderMenuCards(data) {
     card.className = 'menu-card';
     card.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;
     container.appendChild(card);
+    console.log("🔹 Menu card added:", item.name);
   });
 }
 

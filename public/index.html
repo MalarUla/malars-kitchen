@@ -5,6 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malar's Kitchen Order Form</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMXhzfmqcoEjI6OGC7N6EdRNA4BqSCNT4",
+      authDomain: "malarskitchen-36ee7.firebaseapp.com",
+      projectId: "malarskitchen-36ee7",
+      storageBucket: "malarskitchen-36ee7.firebasestorage.app",
+      messagingSenderId: "1003666702818",
+      appId: "1:1003666702818:web:06dde0f846b88495e979bb",
+      measurementId: "G-D9XFS6FP0X"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    // Initialize Firestore and make it available globally
+    const db = firebase.firestore();
+    window.db = db;
+  </script>
+
+  <!-- Your app's logic -->
+  <script defer src="script.js"></script>
 </head>
 <body>
   <header>
@@ -71,30 +102,5 @@
     <p style="margin-top: 1rem;">&copy; 2025 Malar's Kitchen. All rights reserved.</p>
   </footer>  
   
-  <!-- Firebase config + script.js -->
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDMXhzfmqcoEjI6OGC7N6EdRNA4BqSCNT4",
-      authDomain: "malarskitchen-36ee7.firebaseapp.com",
-      projectId: "malarskitchen-36ee7",
-      storageBucket: "malarskitchen-36ee7.firebasestorage.app",
-      messagingSenderId: "1003666702818",
-      appId: "1:1003666702818:web:06dde0f846b88495e979bb",
-      measurementId: "G-D9XFS6FP0X"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
-    const db = firebase.firestore();
-    window.db = db;
-  </script>
-
-  <!-- Your app logic goes here after all elements are loaded -->
-  <script src="script.js"></script>
-
 </body>
 </html>
