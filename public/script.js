@@ -2,7 +2,7 @@ let foodPrices = {};
 const db = firebase.firestore();
 
 function loadFoodItems() {
-  const foodList = document.getElementById("food-list");
+  const foodList = document.getElementById("foodItem");
   foodList.innerHTML = "";
 
   db.collection("fooditems")
