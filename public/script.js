@@ -1,25 +1,23 @@
 let foodPrices = {};
+const db = firebase.firestore();
 
-async function loadFoodItems() {
-  const foodItemSelect = document.getElementById('foodItem');
-  foodItemSelect.innerHTML = '<option value="">Select</option>';
+function loadFoodItems() {
+  const foodList = document.getElementById("food-list");
+  foodList.innerHTML = "";
 
-  try {
-    const snapshot = await db.collection('FoodItems').get();
-    snapshot.forEach(doc => {
-      const item = doc.data();
-      foodPrices[item.name] = item.price;
-      const option = document.createElement('option');
-      option.value = item.name;
-      option.text = item.name;
-      foodItemSelect.appendChild(option);
+  db.collection("fooditems")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const item = document.createElement("div");
+        item.textContent = `${data.name} - ₹${data.price}`;
+        foodList.appendChild(item);
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching food items: ", error);
     });
-    renderMenuCards(snapshot.docs.map(doc => doc.data()));
-    calculatePrice();
-  } catch (error) {
-    console.error("Error fetching food items: ", error);
-    showToast('Failed to load menu. Please try again.', 'error');
-  }
 }
 
 function renderMenuCards(data) {
