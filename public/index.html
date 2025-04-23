@@ -102,6 +102,34 @@
         <!-- Cards will be generated dynamically if needed -->
       </div>
     </section>
+    
+    <section id="adminMenu" style="display: none;">
+      <h2>Admin Menu</h2>
+      <button onclick="showManageOrders()">Manage Orders</button>
+      <button onclick="showExpenseTracking()">Expense Tracking</button>
+      <button onclick="showAdminControls()">Admin Controls</button>
+    </section>
+    
+    <section id="manageOrdersSection" style="display: none;">
+      <h2>Manage Orders</h2>
+      <input type="text" id="orderSearch" placeholder="Search orders...">
+      <table id="ordersTable">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Order rows will be added here dynamically -->
+        </tbody>
+      </table>
+    </section>
+    
   </main>
 
   <div id="toast" class="toast hidden">Order submitted successfully!</div>
