@@ -65,11 +65,6 @@ function showManageOrders() {
   loadOrders(); // Load fresh data
 }
 
-function showManageOrders() {
-  document.getElementById('manageOrdersSection').style.display = 'block';
-  loadOrders(); // Load fresh data
-}
-
 function loadOrders() {
   db.collection("Orders")
     .orderBy("orderDate", "desc")
