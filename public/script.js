@@ -118,7 +118,7 @@ function resetAllFilters() {
 
 function renderFilteredOrders() {
   
-  /*const name = document.getElementById("filterCustomer").value.toLowerCase();
+  const name = document.getElementById("filterCustomer").value.toLowerCase();
   const phone = document.getElementById("filterPhone").value.toLowerCase();
   const item = document.getElementById("filterItem").value.toLowerCase();
   const dateFrom = document.getElementById("filterDateFrom").value;
@@ -138,8 +138,8 @@ function renderFilteredOrders() {
     );
   });
 
-  renderOrdersTable(filtered);*/
-  renderOrdersTable(allOrdersData)
+  renderOrdersTable(filtered);
+  //renderOrdersTable(allOrdersData)
 }
 
 function renderOrdersTable(orders) {
