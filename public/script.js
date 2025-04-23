@@ -1,5 +1,7 @@
 let foodPrices = {};
 let allOrdersData = [];
+let sortColumn = null;
+let sortDirection = 1; // 1 for ascending, -1 for descending
 
 async function loginUser() {
   const username = document.getElementById("loginUsername").value.trim();
@@ -91,18 +93,7 @@ async function fetchAndRenderOrders() {
 }
 
 function setupFilters() {
-  const inputs = [
-    "filterCustomer",
-    "filterPhone",
-    "filterItem",
-    "filterDateFrom",
-    "filterDateTo"
-  ];
-
-  inputs.forEach(id => {
-    document.getElementById(id).addEventListener('input', renderFilteredOrders);
-  });
-
+  // Remove input event listeners, handled by Search button now
   document.getElementById("filterStatus").addEventListener("change", renderFilteredOrders);
 }
 
@@ -146,20 +137,62 @@ function renderOrdersTable(orders) {
   const tableBody = document.getElementById("ordersTableBody");
   tableBody.innerHTML = '';
 
-  orders.forEach(order => {
+  orders.forEach((order, index) => {
     const row = document.createElement('tr');
+    const orderDate = order.orderDate?.toDate ? order.orderDate.toDate().toLocaleDateString() : '';
+    const price = order.price ? '₹' + order.price.toFixed(2) : '';
+
     row.innerHTML = `
+      <td><input type="checkbox" class="rowCheckbox" data-index="${index}"></td>
       <td>${order.name || ''}</td>
       <td>${order.phone || ''}</td>
       <td>${order.item || ''}</td>
       <td>${order.quantity || ''}</td>
-      <td>${order.price ? '₹' + order.price.toFixed(2) : ''}</td>
+      <td>${price}</td>
       <td>${order.orderStatus || ''}</td>
-      <td>${order.orderDate?.toDate ? order.orderDate.toDate().toLocaleDateString() : ''}</td>
+      <td>${orderDate}</td>
     `;
     tableBody.appendChild(row);
   });
+
+  addSortableHeaders(); // New sorting logic
 }
+
+function addSortableHeaders() {
+  document.querySelectorAll("#ordersTable thead th[data-key]").forEach(header => {
+    header.style.cursor = 'pointer';
+    header.addEventListener('click', () => {
+      const key = header.getAttribute("data-key");
+      if (sortColumn === key) {
+        sortDirection *= -1;
+      } else {
+        sortColumn = key;
+        sortDirection = 1;
+      }
+
+      allOrdersData.sort((a, b) => {
+        let aVal = a[key];
+        let bVal = b[key];
+
+        if (aVal?.toDate) aVal = aVal.toDate();
+        if (bVal?.toDate) bVal = bVal.toDate();
+
+        if (aVal < bVal) return -1 * sortDirection;
+        if (aVal > bVal) return 1 * sortDirection;
+        return 0;
+      });
+
+      renderFilteredOrders();
+    });
+  });
+}
+
+function toggleAllCheckboxes(masterCheckbox) {
+  document.querySelectorAll('.rowCheckbox').forEach(cb => {
+    cb.checked = masterCheckbox.checked;
+  });
+}
+
 
 function loadFoodItems() {
   const foodSelect = document.getElementById("foodItem");
