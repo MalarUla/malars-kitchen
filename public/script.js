@@ -61,8 +61,14 @@ function logoutUser() {
 }
 
 function showManageOrders() {
+  document.getElementById("adminMenu").style.display = 'none';
   document.getElementById("manageOrdersSection").style.display = 'block';
-  fetchAndRenderOrders();
+  // Fetch orders only once, if not loaded
+  if (allOrdersData.length === 0) {
+    fetchAndRenderOrders();
+  } else {
+    renderFilteredOrders();
+  }
 }
 
 async function fetchAndRenderOrders() {
@@ -75,8 +81,8 @@ async function fetchAndRenderOrders() {
       allOrdersData.push(data);
     });
 
-    renderFilteredOrders();
-    setupFilters();
+    setupFilters(); // Initialize filters
+    renderFilteredOrders(); // Render table based on default filters (e.g., "Ordered" status)
 
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -118,7 +124,7 @@ function renderFilteredOrders() {
   const selectedStatuses = Array.from(document.getElementById("filterStatus").selectedOptions).map(o => o.value);
 
   const filtered = allOrdersData.filter(order => {
-    const orderDate = order.orderDate ? order.orderDate.toDate() : null;
+    const orderDate = order.orderDate?.toDate ? order.orderDate.toDate() : null;
 
     return (
       (!name || order.name.toLowerCase().includes(name)) &&
@@ -140,13 +146,13 @@ function renderOrdersTable(orders) {
   orders.forEach(order => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${order.name}</td>
-      <td>${order.phone}</td>
-      <td>${order.item}</td>
-      <td>${order.quantity}</td>
-      <td>₹${order.price.toFixed(2)}</td>
-      <td>${order.orderStatus}</td>
-      <td>${order.orderDate ? order.orderDate.toDate().toLocaleDateString() : ''}</td>
+      <td>${order.name || ''}</td>
+      <td>${order.phone || ''}</td>
+      <td>${order.item || ''}</td>
+      <td>${order.quantity || ''}</td>
+      <td>${order.price ? '₹' + order.price.toFixed(2) : ''}</td>
+      <td>${order.orderStatus || ''}</td>
+      <td>${order.orderDate?.toDate ? order.orderDate.toDate().toLocaleDateString() : ''}</td>
     `;
     tableBody.appendChild(row);
   });
