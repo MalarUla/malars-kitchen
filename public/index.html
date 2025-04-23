@@ -109,6 +109,28 @@
       <button onclick="showExpenseTracking()">Expense Tracking</button>
       <button onclick="showAdminControls()">Admin Controls</button>
     </section>
+
+    <div id="manageOrdersSection" style="display: none; margin-top: 20px;">
+      <h3>Manage Orders</h3>
+      <input type="text" id="orderSearch" placeholder="Search orders..." style="margin-bottom: 10px; width: 250px;" />
+      <button onclick="resetOrderSearch()">Reset</button>
+      <table id="ordersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%; margin-top: 10px;">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Ordered Date</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+          <!-- Orders will appear here -->
+        </tbody>
+      </table>
+    </div>
     
   </main>
 
