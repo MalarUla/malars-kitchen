@@ -112,33 +112,54 @@
 
     <div id="manageOrdersSection" style="display: none; margin-top: 20px;">
       <h3>Manage Orders</h3>
-
-        <!-- 🔍 Filter inputs -->
-      <div style="margin-bottom: 10px;">
-        <input type="text" id="searchCustomer" placeholder="Customer Name" />
-        <input type="text" id="searchPhone" placeholder="Phone" />
-        <input type="text" id="searchItem" placeholder="Food Item" />
-        <input type="text" id="searchStatus" placeholder="Status" />
-        <button onclick="resetOrderSearch()">Reset</button>
-      </div>
-
-      <table id="ordersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%; margin-top: 10px;">
+    
+      <table id="ordersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%;">
         <thead>
           <tr>
-            <th>Customer</th>
-            <th>Phone</th>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Ordered Date</th>
+            <th>
+              Customer<br />
+              <input type="text" id="filterCustomer" placeholder="Search..." />
+            </th>
+            <th>
+              Phone<br />
+              <input type="text" id="filterPhone" placeholder="Search..." />
+            </th>
+            <th>
+              Item<br />
+              <input type="text" id="filterItem" placeholder="Search..." />
+            </th>
+            <th>
+              Qty
+            </th>
+            <th>
+              Price
+            </th>
+            <th>
+              Status<br />
+              <select id="filterStatus" multiple style="width: 100%;">
+                <option value="Ordered">Ordered</option>
+                <option value="In Prep">In Prep</option>
+                <option value="Ready">Ready</option>
+                <option value="Delivered">Delivered</option>
+              </select>
+            </th>
+            <th>
+              Ordered Date<br />
+              <input type="date" id="filterDateFrom" style="width: 48%;" />
+              <input type="date" id="filterDateTo" style="width: 48%;" />
+            </th>
+          </tr>
+          <tr>
+            <th colspan="7" style="text-align: right;">
+              <button onclick="resetAllFilters()">Reset Filters</button>
+            </th>
           </tr>
         </thead>
         <tbody id="ordersTableBody">
-          <!-- Orders will appear here -->
+          <!-- Data goes here -->
         </tbody>
       </table>
-    </div>
+    </div> 
     
   </main>
 

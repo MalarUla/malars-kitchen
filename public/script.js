@@ -61,37 +61,72 @@ function logoutUser() {
 }
 
 function showManageOrders() {
-  document.getElementById('manageOrdersSection').style.display = 'block';
-  fetchAndRenderOrders(); // Load fresh data
+  document.getElementById("manageOrdersSection").style.display = 'block';
+  fetchAndRenderOrders();
 }
 
-function resetOrderSearch() {
-  document.getElementById("searchCustomer").value = '';
-  document.getElementById("searchPhone").value = '';
-  document.getElementById("searchItem").value = '';
-  document.getElementById("searchStatus").value = '';
-  fetchAndRenderOrders(); // Show all again
+async function fetchAndRenderOrders() {
+  try {
+    const snapshot = await db.collection('Orders').get();
+    allOrdersData = [];
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      allOrdersData.push(data);
+    });
+
+    renderFilteredOrders();
+    setupFilters();
+
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+  }
 }
 
-function setupOrderSearchListeners(allOrders) {
-  const inputs = ['searchCustomer', 'searchPhone', 'searchItem', 'searchStatus'];
+function setupFilters() {
+  const inputs = [
+    "filterCustomer",
+    "filterPhone",
+    "filterItem",
+    "filterDateFrom",
+    "filterDateTo"
+  ];
+
   inputs.forEach(id => {
-    document.getElementById(id).addEventListener('input', () => filterAndRenderOrders(allOrders));
+    document.getElementById(id).addEventListener('input', renderFilteredOrders);
   });
+
+  document.getElementById("filterStatus").addEventListener("change", renderFilteredOrders);
 }
 
-function filterAndRenderOrders(allOrders) {
-  const nameFilter = document.getElementById("searchCustomer").value.toLowerCase();
-  const phoneFilter = document.getElementById("searchPhone").value.toLowerCase();
-  const itemFilter = document.getElementById("searchItem").value.toLowerCase();
-  const statusFilter = document.getElementById("searchStatus").value.toLowerCase();
+function resetAllFilters() {
+  document.getElementById("filterCustomer").value = '';
+  document.getElementById("filterPhone").value = '';
+  document.getElementById("filterItem").value = '';
+  document.getElementById("filterStatus").selectedIndex = -1;
+  document.getElementById("filterDateFrom").value = '';
+  document.getElementById("filterDateTo").value = '';
+  renderFilteredOrders();
+}
 
-  const filtered = allOrders.filter(order => {
+function renderFilteredOrders() {
+  const name = document.getElementById("filterCustomer").value.toLowerCase();
+  const phone = document.getElementById("filterPhone").value.toLowerCase();
+  const item = document.getElementById("filterItem").value.toLowerCase();
+  const dateFrom = document.getElementById("filterDateFrom").value;
+  const dateTo = document.getElementById("filterDateTo").value;
+  const selectedStatuses = Array.from(document.getElementById("filterStatus").selectedOptions).map(o => o.value);
+
+  const filtered = allOrdersData.filter(order => {
+    const orderDate = order.orderDate ? order.orderDate.toDate() : null;
+
     return (
-      order.name.toLowerCase().includes(nameFilter) &&
-      order.phone.toLowerCase().includes(phoneFilter) &&
-      order.item.toLowerCase().includes(itemFilter) &&
-      order.orderStatus.toLowerCase().includes(statusFilter)
+      (!name || order.name.toLowerCase().includes(name)) &&
+      (!phone || order.phone.toLowerCase().includes(phone)) &&
+      (!item || order.item.toLowerCase().includes(item)) &&
+      (selectedStatuses.length === 0 || selectedStatuses.includes(order.orderStatus)) &&
+      (!dateFrom || (orderDate && new Date(orderDate) >= new Date(dateFrom))) &&
+      (!dateTo || (orderDate && new Date(orderDate) <= new Date(dateTo)))
     );
   });
 
@@ -111,34 +146,11 @@ function renderOrdersTable(orders) {
       <td>${order.quantity}</td>
       <td>₹${order.price.toFixed(2)}</td>
       <td>${order.orderStatus}</td>
-      <td>${order.orderDate ? order.orderDate.toDate().toLocaleString() : ''}</td>
+      <td>${order.orderDate ? order.orderDate.toDate().toLocaleDateString() : ''}</td>
     `;
     tableBody.appendChild(row);
   });
 }
-
-async function fetchAndRenderOrders() {
-  try {
-    const snapshot = await db.collection('Orders').get();
-
-    const orders = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      orders.push(data);
-    });
-
-    // By default, show only "Ordered" status
-    const initialOrders = orders.filter(o => o.orderStatus === 'Ordered');
-    renderOrdersTable(initialOrders);
-
-    // Setup search filters
-    setupOrderSearchListeners(orders);
-
-  } catch (error) {
-    console.error("Failed to fetch orders:", error);
-  }
-}
-
 
 function loadFoodItems() {
   const foodSelect = document.getElementById("foodItem");
