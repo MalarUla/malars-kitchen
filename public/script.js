@@ -112,7 +112,13 @@ async function submitOrder() {
       quantity,
       price,
       comments,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+      orderStatus: 'Ordered',
+      paymentStatus: 'Pending',
+      paymentReceivedDate: null,
+      paymentMethod: '',
+      paymentReference: '',
+      updatedDate: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     showToast('Order submitted successfully!', 'success');
