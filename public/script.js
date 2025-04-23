@@ -8,6 +8,7 @@ function loadFoodItems() {
   foodSelect.innerHTML = `<option value="">Select</option>`;
   foodPrices = {}; // Reset prices
 
+  console.log("📤 Attempting to fetch FoodItems...");
   db.collection("FoodItems")
     .get()
     .then((querySnapshot) => {
