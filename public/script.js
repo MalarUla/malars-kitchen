@@ -78,6 +78,7 @@ async function fetchAndRenderOrders() {
 
     snapshot.forEach(doc => {
       const data = doc.data();
+      console.log("Fetched order:", data);
       allOrdersData.push(data);
     });
 
@@ -116,7 +117,8 @@ function resetAllFilters() {
 }
 
 function renderFilteredOrders() {
-  const name = document.getElementById("filterCustomer").value.toLowerCase();
+  
+  /*const name = document.getElementById("filterCustomer").value.toLowerCase();
   const phone = document.getElementById("filterPhone").value.toLowerCase();
   const item = document.getElementById("filterItem").value.toLowerCase();
   const dateFrom = document.getElementById("filterDateFrom").value;
@@ -136,7 +138,8 @@ function renderFilteredOrders() {
     );
   });
 
-  renderOrdersTable(filtered);
+  renderOrdersTable(filtered);*/
+  renderOrdersTable(allOrdersData)
 }
 
 function renderOrdersTable(orders) {
