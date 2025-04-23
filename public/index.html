@@ -6,6 +6,8 @@
   <title>Malar's Kitchen Order Form</title>
   <link rel="stylesheet" href="style.css">
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+
   <!-- Firebase SDK (non-modular compat version) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -49,6 +51,20 @@
   </header>
 
   <main>
+    <section class="auth-section">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="loginUsername">Username*</label>
+        <input type="text" id="loginUsername" autocomplete="off" required>
+    
+        <label for="loginPassword">Password*</label>
+        <input type="password" id="loginPassword" autocomplete="off" required>
+    
+        <button type="button" onclick="loginUser()">Login</button>
+      </form>
+      <button id="logoutBtn" onclick="logoutUser()" style="display: none;">Logout</button>
+    </section>
+
     <section class="form-section">
       <h2>Place Your Order</h2>
       <form id="orderForm">

@@ -1,5 +1,52 @@
 let foodPrices = {};
 
+async function loginUser() {
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  if (!username || !password) {
+    showToast('Please fill in both username and password.', 'error');
+    return;
+  }
+
+  try {
+    const querySnapshot = await db.collection('Users')
+      .where('username', '==', username)
+      .limit(1)
+      .get();
+
+    if (querySnapshot.empty) {
+      showToast('User not found.', 'error');
+      return;
+    }
+
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
+
+    const passwordMatch = await bcrypt.compare(password, userData.hashedPassword);
+    if (passwordMatch) {
+      localStorage.setItem('loggedInUser', username);
+      showToast('Login successful!', 'success');
+      document.getElementById("loginForm").style.display = 'none';
+      document.getElementById("logoutBtn").style.display = 'block';
+      // Optionally show/hide parts of app based on login
+    } else {
+      showToast('Invalid credentials.', 'error');
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    showToast('Login failed. Try again later.', 'error');
+  }
+}
+
+function logoutUser() {
+  localStorage.removeItem('loggedInUser');
+  document.getElementById("loginForm").style.display = 'block';
+  document.getElementById("logoutBtn").style.display = 'none';
+  showToast('Logged out successfully.', 'success');
+}
+
+
 function loadFoodItems() {
   const foodSelect = document.getElementById("foodItem");
   const menuData = [];
@@ -130,6 +177,13 @@ window.addEventListener('load', () => {
     loadFoodItems(); // Proceed with loading food items
   } else {
     console.error("❌ Firebase or Firestore not initialized.");
+  }
+
+  // auto-toggle UI based on login
+  const user = localStorage.getItem('loggedInUser');
+  if (user) {
+    document.getElementById("loginForm").style.display = 'none';
+    document.getElementById("logoutBtn").style.display = 'block';
   }
 
   // Setup theme toggle
