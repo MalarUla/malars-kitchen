@@ -11,15 +11,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
 
-    <!-- Check if Firebase is loaded -->
-  <script>
-    if (typeof firebase !== 'undefined') {
-      console.log("Firebase SDK is loaded successfully.");
-    } else {
-      console.error("Firebase SDK failed to load.");
-    }
-  </script>
-
   <script>
     // Your web app's Firebase configuration
     const firebaseConfig = {
@@ -41,14 +32,9 @@
       window.db = db;
 
       firebase.analytics();
-
-      // Check Firebase initialization
-      console.log("Firebase initialized: ", firebase.apps.length > 0 ? "Yes" : "No");
     } catch (error) {
       console.error("Firebase initialization error:", error);
     }
-    
-
   </script>
 
   <!-- Your app's logic -->

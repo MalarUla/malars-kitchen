@@ -1,18 +1,15 @@
 let foodPrices = {};
 
 function loadFoodItems() {
-  console.log("✅ loadFoodItems() called");
   const foodSelect = document.getElementById("foodItem");
   const menuData = [];
 
   foodSelect.innerHTML = `<option value="">Select</option>`;
   foodPrices = {}; // Reset prices
 
-  console.log("📤 Attempting to fetch FoodItems...");
   db.collection("FoodItems")
     .get()
     .then((querySnapshot) => {
-      console.log("✅ Firebase call successful. Documents found:", querySnapshot.size);
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         console.log("🔹 Food item fetched:", data);
@@ -31,7 +28,6 @@ function loadFoodItems() {
         // Push to menu list for rendering cards
         menuData.push({ name, price });
       });
-      console.log("✅ Completed food item population. Menu data:", menuData);
 
       // Now render the menu cards
       renderMenuCards(menuData);
@@ -42,7 +38,6 @@ function loadFoodItems() {
 }
 
 function renderMenuCards(data) {
-  console.log("✅ renderMenuCards() called with:", data);
   const container = document.getElementById('menuCards');
   container.innerHTML = '';
   data.forEach(item => {
@@ -50,7 +45,6 @@ function renderMenuCards(data) {
     card.className = 'menu-card';
     card.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;
     container.appendChild(card);
-    console.log("🔹 Menu card added:", item.name);
   });
 }
 
@@ -118,23 +112,21 @@ async function submitOrder() {
       paymentReceivedDate: null,
       paymentMethod: '',
       paymentReference: '',
-      updatedDate: firebase.firestore.FieldValue.serverTimestamp()
+      updatedDate: firebase.firestore.FieldValue.serverTimestamp(),
+      additionalDetails: ''
     });
 
     showToast('Order submitted successfully!', 'success');
     clearForm();
   } catch (error) {
-    console.error('❌ Error submitting order:', error);
     showToast('Failed to submit order. Please try again later.', 'error');
   }
 }
 
 window.addEventListener('load', () => {
-  console.log("📦 Page fully loaded. Initializing app...");
   
   // Check if Firestore is available before calling loadFoodItems
   if (window.db) {
-    console.log("✅ Firebase and Firestore are ready.");
     loadFoodItems(); // Proceed with loading food items
   } else {
     console.error("❌ Firebase or Firestore not initialized.");
