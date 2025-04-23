@@ -27,9 +27,15 @@ async function loginUser() {
     if (passwordMatch) {
       localStorage.setItem('loggedInUser', username);
       showToast('Login successful!', 'success');
+
       document.getElementById("loginForm").style.display = 'none';
       document.getElementById("logoutBtn").style.display = 'block';
-      // Optionally show/hide parts of app based on login
+      
+      // Show admin menu only
+      document.querySelector('.form-section').style.display = 'none';
+      document.querySelector('.menu-section').style.display = 'none';
+      document.getElementById('adminMenu').style.display = 'block';
+
     } else {
       showToast('Invalid credentials.', 'error');
     }
@@ -43,6 +49,13 @@ function logoutUser() {
   localStorage.removeItem('loggedInUser');
   document.getElementById("loginForm").style.display = 'block';
   document.getElementById("logoutBtn").style.display = 'none';
+
+  // Reset UI on logout
+  document.querySelector('.form-section').style.display = 'block';    
+  document.querySelector('.menu-section').style.display = 'block';
+  document.getElementById('adminMenu').style.display = 'none';    
+  document.getElementById('manageOrdersSection').style.display = 'none';
+
   showToast('Logged out successfully.', 'success');
 }
 
@@ -184,6 +197,11 @@ window.addEventListener('load', () => {
   if (user) {
     document.getElementById("loginForm").style.display = 'none';
     document.getElementById("logoutBtn").style.display = 'block';
+
+    // Show admin menu only
+    document.querySelector('.form-section').style.display = 'none';
+    document.querySelector('.menu-section').style.display = 'none';
+    document.getElementById('adminMenu').style.display = 'block';
   }
 
   // Setup theme toggle
