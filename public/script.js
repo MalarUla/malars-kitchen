@@ -23,7 +23,7 @@ async function loginUser() {
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
 
-    const passwordMatch = await bcrypt.compare(password, userData.hashedPassword);
+    const passwordMatch = await dcodeIO.bcrypt.compare(password, userData.hashedPassword);
     if (passwordMatch) {
       localStorage.setItem('loggedInUser', username);
       showToast('Login successful!', 'success');
