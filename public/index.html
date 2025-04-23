@@ -6,10 +6,10 @@
   <title>Malar's Kitchen Order Form</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Firebase App (the core Firebase SDK) as modules -->
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js"></script>
+  <!-- Firebase SDK (non-modular compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
 
     <!-- Check if Firebase is loaded -->
   <script>
@@ -19,7 +19,7 @@
       console.error("Firebase SDK failed to load.");
     }
   </script>
-  
+
   <script>
     // Your web app's Firebase configuration
     const firebaseConfig = {
