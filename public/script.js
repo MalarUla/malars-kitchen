@@ -1,4 +1,5 @@
 let foodPrices = {};
+let allOrdersData = [];
 
 async function loginUser() {
   const username = document.getElementById("loginUsername").value.trim();
@@ -57,6 +58,81 @@ function logoutUser() {
   document.getElementById('manageOrdersSection').style.display = 'none';
 
   showToast('Logged out successfully.', 'success');
+}
+
+function showManageOrders() {
+  document.getElementById('manageOrdersSection').style.display = 'block';
+  loadOrders(); // Load fresh data
+}
+
+function showManageOrders() {
+  document.getElementById('manageOrdersSection').style.display = 'block';
+  loadOrders(); // Load fresh data
+}
+
+function loadOrders() {
+  db.collection("Orders")
+    .orderBy("orderDate", "desc")
+    .get()
+    .then(querySnapshot => {
+      allOrdersData = []; // Clear old cache
+
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        allOrdersData.push({
+          id: doc.id,
+          ...data
+        });
+      });
+
+      // Show default view with 'Ordered' status
+      renderOrdersTable(allOrdersData.filter(o => o.orderStatus === 'Ordered'));
+    })
+    .catch(error => {
+      console.error("❌ Error loading orders:", error);
+      showToast("Failed to load orders", 'error');
+    });
+}
+
+function renderOrdersTable(data) {
+  const tbody = document.getElementById('ordersTableBody');
+  tbody.innerHTML = '';
+
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7">No matching orders found.</td></tr>';
+    return;
+  }
+
+  data.forEach(order => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${order.name || ''}</td>
+      <td>${order.phone || ''}</td>
+      <td>${order.item || ''}</td>
+      <td>${order.quantity || ''}</td>
+      <td>₹${order.price?.toFixed(2) || '0.00'}</td>
+      <td>${order.orderStatus || ''}</td>
+      <td>${order.orderDate?.toDate().toLocaleString() || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById("orderSearch").addEventListener("input", function () {
+  const keyword = this.value.trim().toLowerCase();
+
+  const filtered = allOrdersData.filter(order =>
+    Object.values(order).some(value =>
+      String(value).toLowerCase().includes(keyword)
+    )
+  );
+
+  renderOrdersTable(filtered);
+});
+
+function resetOrderSearch() {
+  document.getElementById("orderSearch").value = '';
+  renderOrdersTable(allOrdersData); // Show all orders again
 }
 
 
