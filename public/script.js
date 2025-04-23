@@ -8,7 +8,7 @@ function loadFoodItems() {
   foodSelect.innerHTML = `<option value="">Select</option>`;
   foodPrices = {}; // Reset prices
 
-  db.collection("fooditems")
+  db.collection("FoodItems")
     .get()
     .then((querySnapshot) => {
       console.log("✅ Firebase call successful. Documents found:", querySnapshot.size);
