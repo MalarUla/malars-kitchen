@@ -62,72 +62,81 @@ function logoutUser() {
 
 function showManageOrders() {
   document.getElementById('manageOrdersSection').style.display = 'block';
-  loadOrders(); // Load fresh data
+  fetchAndRenderOrders(); // Load fresh data
 }
 
-function loadOrders() {
-  db.collection("Orders")
-    .orderBy("orderDate", "desc")
-    .get()
-    .then(querySnapshot => {
-      allOrdersData = []; // Clear old cache
-
-      querySnapshot.forEach(doc => {
-        const data = doc.data();
-        allOrdersData.push({
-          id: doc.id,
-          ...data
-        });
-      });
-
-      // Show default view with 'Ordered' status
-      renderOrdersTable(allOrdersData.filter(o => o.orderStatus === 'Ordered'));
-    })
-    .catch(error => {
-      console.error("❌ Error loading orders:", error);
-      showToast("Failed to load orders", 'error');
-    });
+function resetOrderSearch() {
+  document.getElementById("searchCustomer").value = '';
+  document.getElementById("searchPhone").value = '';
+  document.getElementById("searchItem").value = '';
+  document.getElementById("searchStatus").value = '';
+  fetchAndRenderOrders(); // Show all again
 }
 
-function renderOrdersTable(data) {
-  const tbody = document.getElementById('ordersTableBody');
-  tbody.innerHTML = '';
-
-  if (data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7">No matching orders found.</td></tr>';
-    return;
-  }
-
-  data.forEach(order => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${order.name || ''}</td>
-      <td>${order.phone || ''}</td>
-      <td>${order.item || ''}</td>
-      <td>${order.quantity || ''}</td>
-      <td>₹${order.price?.toFixed(2) || '0.00'}</td>
-      <td>${order.orderStatus || ''}</td>
-      <td>${order.orderDate?.toDate().toLocaleString() || ''}</td>
-    `;
-    tbody.appendChild(tr);
+function setupOrderSearchListeners(allOrders) {
+  const inputs = ['searchCustomer', 'searchPhone', 'searchItem', 'searchStatus'];
+  inputs.forEach(id => {
+    document.getElementById(id).addEventListener('input', () => filterAndRenderOrders(allOrders));
   });
 }
 
-document.getElementById("orderSearch").addEventListener("input", function () {
-  const keyword = this.value.trim().toLowerCase();
+function filterAndRenderOrders(allOrders) {
+  const nameFilter = document.getElementById("searchCustomer").value.toLowerCase();
+  const phoneFilter = document.getElementById("searchPhone").value.toLowerCase();
+  const itemFilter = document.getElementById("searchItem").value.toLowerCase();
+  const statusFilter = document.getElementById("searchStatus").value.toLowerCase();
 
-  const filtered = allOrdersData.filter(order =>
-    Object.values(order).some(value =>
-      String(value).toLowerCase().includes(keyword)
-    )
-  );
+  const filtered = allOrders.filter(order => {
+    return (
+      order.name.toLowerCase().includes(nameFilter) &&
+      order.phone.toLowerCase().includes(phoneFilter) &&
+      order.item.toLowerCase().includes(itemFilter) &&
+      order.orderStatus.toLowerCase().includes(statusFilter)
+    );
+  });
 
   renderOrdersTable(filtered);
-});
+}
 
-function resetOrderSearch() {
-  document.getElementById("orderSearch").value = '';
-  renderOrdersTable(allOrdersData); // Show all orders again
+function renderOrdersTable(orders) {
+  const tableBody = document.getElementById("ordersTableBody");
+  tableBody.innerHTML = '';
+
+  orders.forEach(order => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${order.name}</td>
+      <td>${order.phone}</td>
+      <td>${order.item}</td>
+      <td>${order.quantity}</td>
+      <td>₹${order.price.toFixed(2)}</td>
+      <td>${order.orderStatus}</td>
+      <td>${order.orderDate ? order.orderDate.toDate().toLocaleString() : ''}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+async function fetchAndRenderOrders() {
+  try {
+    const snapshot = await db.collection('Orders').get();
+
+    const orders = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      orders.push(data);
+    });
+
+    // By default, show only "Ordered" status
+    const initialOrders = orders.filter(o => o.orderStatus === 'Ordered');
+    renderOrdersTable(initialOrders);
+
+    // Setup search filters
+    setupOrderSearchListeners(orders);
+
+  } catch (error) {
+    console.error("Failed to fetch orders:", error);
+  }
 }
 
 

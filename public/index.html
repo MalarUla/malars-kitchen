@@ -112,8 +112,16 @@
 
     <div id="manageOrdersSection" style="display: none; margin-top: 20px;">
       <h3>Manage Orders</h3>
-      <input type="text" id="orderSearch" placeholder="Search orders..." style="margin-bottom: 10px; width: 250px;" />
-      <button onclick="resetOrderSearch()">Reset</button>
+
+        <!-- 🔍 Filter inputs -->
+      <div style="margin-bottom: 10px;">
+        <input type="text" id="searchCustomer" placeholder="Customer Name" />
+        <input type="text" id="searchPhone" placeholder="Phone" />
+        <input type="text" id="searchItem" placeholder="Food Item" />
+        <input type="text" id="searchStatus" placeholder="Status" />
+        <button onclick="resetOrderSearch()">Reset</button>
+      </div>
+
       <table id="ordersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%; margin-top: 10px;">
         <thead>
           <tr>
