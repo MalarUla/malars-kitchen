@@ -136,6 +136,26 @@ footer {
   margin-top: 2rem;
 }
 
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+table {
+  width: max-content;
+  min-width: 1000px; /* Or adjust based on your total expected columns */
+  border-collapse: collapse;
+}
+
+th, td {
+  white-space: nowrap; /* Prevent line breaks */
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+
 @media screen and (max-width: 768px) {
   .menu-card {
     flex: 1 1 100%;
@@ -145,16 +165,12 @@ footer {
     flex-direction: column;
     text-align: center;
   }
-  #ordersTable th, #ordersTable td {
+  th, td {
     font-size: 12px;
     padding: 6px;
   }
 }
 
-.table-container {
-  overflow-x: auto;
-  width: 100%;
-}
 
 #ordersTable {
   min-width: 1000px; /* You can tweak this based on how many columns you have */
