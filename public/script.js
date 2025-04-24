@@ -104,6 +104,7 @@ function resetAllFilters() {
   document.getElementById("filterStatus").selectedIndex = -1;
   document.getElementById("filterDateFrom").value = '';
   document.getElementById("filterDateTo").value = '';
+  document.getElementById("filterPaymentStatus").selectedIndex = -1;
   renderFilteredOrders();
 }
 
@@ -115,7 +116,8 @@ function renderFilteredOrders() {
   const dateFrom = document.getElementById("filterDateFrom").value;
   const dateTo = document.getElementById("filterDateTo").value;
   const selectedStatuses = Array.from(document.getElementById("filterStatus").selectedOptions).map(o => o.value);
-
+  const selectedPaymentStatuses = Array.from(document.getElementById("filterPaymentStatus").selectedOptions).map(o => o.value);
+  
   const filtered = allOrdersData.filter(order => {
     const orderDate = order.orderDate?.toDate ? order.orderDate.toDate() : null;
 
@@ -125,7 +127,8 @@ function renderFilteredOrders() {
       (!item || order.item.toLowerCase().includes(item)) &&
       (selectedStatuses.length === 0 || selectedStatuses.includes(order.orderStatus)) &&
       (!dateFrom || (orderDate && new Date(orderDate) >= new Date(dateFrom))) &&
-      (!dateTo || (orderDate && new Date(orderDate) <= new Date(dateTo)))
+      (!dateTo || (orderDate && new Date(orderDate) <= new Date(dateTo))) &&
+      (selectedPaymentStatuses.length === 0 || selectedPaymentStatuses.includes(order.paymentStatus))
     );
   });
 
@@ -140,17 +143,24 @@ function renderOrdersTable(orders) {
   orders.forEach((order, index) => {
     const row = document.createElement('tr');
     const orderDate = order.orderDate?.toDate ? order.orderDate.toDate().toLocaleDateString() : '';
-    const price = order.price ? '₹' + order.price.toFixed(2) : '';
+    const price = order.price ? '$' + order.price.toFixed(2) : '';
 
     row.innerHTML = `
       <td><input type="checkbox" class="rowCheckbox" data-index="${index}"></td>
       <td>${order.name || ''}</td>
       <td>${order.phone || ''}</td>
+      <td>${order.email || ''}</td>
       <td>${order.item || ''}</td>
       <td>${order.quantity || ''}</td>
       <td>${price}</td>
       <td>${order.orderStatus || ''}</td>
       <td>${orderDate}</td>
+      <td>${order.paymentStatus || ''}</td>
+      <td>${order.paymentReceivedDate || ''}</td>
+      <td>${order.paymentMethod || ''}</td>
+      <td>${order.paymentReference || ''}</td>
+      <td>${order.comments || ''}</td>
+      <td>${order.additionalDetails || ''}</td>
     `;
     tableBody.appendChild(row);
   });
@@ -160,9 +170,10 @@ function renderOrdersTable(orders) {
 
 function addSortableHeaders() {
   document.querySelectorAll("#ordersTable thead th[data-key]").forEach(header => {
-    header.style.cursor = 'pointer';
     header.addEventListener('click', () => {
       const key = header.getAttribute("data-key");
+
+      // Toggle direction
       if (sortColumn === key) {
         sortDirection *= -1;
       } else {
@@ -170,22 +181,38 @@ function addSortableHeaders() {
         sortDirection = 1;
       }
 
-      allOrdersData.sort((a, b) => {
+      // Sort the data
+      filteredOrders.sort((a, b) => {
         let aVal = a[key];
         let bVal = b[key];
 
         if (aVal?.toDate) aVal = aVal.toDate();
         if (bVal?.toDate) bVal = bVal.toDate();
 
-        if (aVal < bVal) return -1 * sortDirection;
-        if (aVal > bVal) return 1 * sortDirection;
-        return 0;
+        aVal = aVal ?? '';
+        bVal = bVal ?? '';
+
+        return aVal > bVal ? sortDirection : aVal < bVal ? -sortDirection : 0;
       });
 
-      renderFilteredOrders();
+      renderOrdersTable(filteredOrders);
+      updateSortIcons();
     });
   });
 }
+
+function updateSortIcons() {
+  document.querySelectorAll("#ordersTable thead th").forEach(th => {
+    const arrow = th.querySelector(".sort-arrow");
+    if (arrow) arrow.textContent = '';
+  });
+
+  const activeTh = document.querySelector(`#ordersTable thead th[data-key="${sortColumn}"] .sort-arrow`);
+  if (activeTh) {
+    activeTh.textContent = sortDirection === 1 ? '↑' : '↓';
+  }
+}
+
 
 function toggleAllCheckboxes(masterCheckbox) {
   document.querySelectorAll('.rowCheckbox').forEach(cb => {
