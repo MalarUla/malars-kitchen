@@ -139,20 +139,12 @@ footer {
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
-  display: block;
-}
-
-table {
-  width: max-content;
-  min-width: 1000px; /* Or adjust based on your total expected columns */
-  border-collapse: collapse;
-}
-
-th, td {
-  white-space: nowrap; /* Prevent line breaks */
-  padding: 8px;
   border: 1px solid #ddd;
-  text-align: left;
+  border-radius: 8px;
+}
+
+.table-scroll {
+  min-width: 1200px; /* force horizontal scroll even on wide screens */
 }
 
 
@@ -165,43 +157,27 @@ th, td {
     flex-direction: column;
     text-align: center;
   }
-  th, td {
-    font-size: 12px;
-    padding: 6px;
-  }
 }
 
-
-#ordersTable {
-  min-width: 1000px; /* You can tweak this based on how many columns you have */
+table.orders-table {
+  width: 100%;
   border-collapse: collapse;
 }
 
-.orders-table thead th {
+table.orders-table th, table.orders-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+  text-align: left;
+}
+
+table.orders-table th {
+  background-color: #f5f5f5;
   position: sticky;
   top: 0;
-  background-color: #f4f4f4;
-  z-index: 2;
+  z-index: 1;
 }
 
-.orders-table th,
-.orders-table td {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  text-align: left;
-  white-space: nowrap; /* ensures content stays in one line */
-}
-
-.orders-table th {
-  background-color: #f4f4f4;
-  cursor: pointer;
-}
-.orders-table tr:nth-child(even) {
-  background-color: #fafafa;
-}
-.orders-table tr:hover {
-  background-color: #eef;
-}
 .search-controls {
   display: flex;
   flex-wrap: wrap;
@@ -230,4 +206,60 @@ th, td {
   font-size: 0.9em;
   margin-left: 5px;
   color: #888;
+}
+
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.modern-table th {
+  background-color: #f6f9fc;
+  font-weight: 600;
+  color: #333;
+}
+
+.modern-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.modern-table input[type="text"],
+.modern-table input[type="date"],
+.modern-table input[type="number"] {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.modern-table button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #6c63ff;
+  color: white;
+  font-size: 14px;
+}
+
+.modern-table button:hover {
+  background-color: #5146d8;
 }

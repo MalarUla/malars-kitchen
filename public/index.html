@@ -109,6 +109,11 @@
       <button onclick="showExpenseTracking()">Expense Tracking</button>
       <button onclick="showAdminControls()">Admin Controls</button>
     </section>
+    
+    <div id="expenseTrackingSection" style="display: none; margin-top: 20px;">
+      <h3>Expense Tracking</h3>
+      <div id="expenseTable"></div>
+    </div>
 
     <div id="manageOrdersSection" style="display: none; margin-top: 20px;">
       <h3>Manage Orders</h3>
@@ -119,75 +124,77 @@
       </div>
       
       <div class="table-wrapper">
-        <table id="ordersTable" class="orders-table">
-          <thead>
-            <tr>
-              <th><input type="checkbox" onclick="toggleAllCheckboxes(this)"/></th>
-              <th data-key="name">
-                Customer <span class="sort-arrow"></span> <br />
-                <input type="text" id="filterCustomer" placeholder="Search..." />
-              </th>
-              <th data-key="phone">
-                Phone <span class="sort-arrow"></span> <br />
-                <input type="text" id="filterPhone" placeholder="Search..." />
-              </th>
-              <th data-key="email">
-                email <span class="sort-arrow"></span> <br />
-                <input type="text" id="filterEmail" placeholder="Search..." />
-              </th>
-              <th data-key="item">
-                Item <span class="sort-arrow"></span> <br />
-                <input type="text" id="filterItem" placeholder="Search..." />
-              </th>
-              <th data-key="quantity">
-                Qty <span class="sort-arrow"></span>
-              </th>
-              <th data-key="price">
-                Price <span class="sort-arrow"></span>
-              </th>
-              <th data-key="orderStatus">
-                Order Status <span class="sort-arrow"></span> <br />
-                <select id="filterStatus" multiple style="width: 100%;">
-                  <option value="Ordered">Ordered</option>
-                  <option value="In Prep">In Prep</option>
-                  <option value="Ready">Ready</option>
-                  <option value="Delivered">Delivered</option>
-                </select>
-              </th>
-              <th data-key="orderDate">
-                Ordered Date <span class="sort-arrow"></span> <br />
-                <input type="date" id="filterDateFrom" style="width: 48%;" />
-                <input type="date" id="filterDateTo" style="width: 48%;" />
-              </th>
-              <th data-key="paymentStatus">
-                Payment Status <span class="sort-arrow"></span> <br />
-                <select id="filterPaymentStatus" multiple style="width: 100%;">
-                  <option value="Pending">Pending</option>
-                  <option value="Fully Received">Fully Received</option>
-                  <option value="Partially Received">Partially Received</option>
-                </select>
-              </th>
-              <th data-key="paymentReceivedDate">
-                Payment Received Date <span class="sort-arrow"></span>
-              </th>
-              <th data-key="paymentMethod">
-                Payment Method <span class="sort-arrow"></span>
-              </th>
-              <th data-key="paymentReference">
-                Payment Reference <span class="sort-arrow"></span>
-              </th>
-              <th data-key="comments">
-                Suggestions/Instructions <span class="sort-arrow"></span>
-              </th>
-              <th data-key="additionalDetails">
-                Additional Details <span class="sort-arrow"></span>
-              </th>
-            </tr>
-          </thead>
-          <tbody id="ordersTableBody">
-            <!-- Data goes here -->
-          </tbody>
-        </table>
+        <div class="table-scroll">
+          <table id="ordersTable" class="orders-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" onclick="toggleAllCheckboxes(this)"/></th>
+                <th data-key="name">
+                  Customer <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterCustomer" placeholder="Search..." />
+                </th>
+                <th data-key="phone">
+                  Phone <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterPhone" placeholder="Search..." />
+                </th>
+                <th data-key="email">
+                  email <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterEmail" placeholder="Search..." />
+                </th>
+                <th data-key="item">
+                  Item <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterItem" placeholder="Search..." />
+                </th>
+                <th data-key="quantity">
+                  Qty <span class="sort-arrow"></span>
+                </th>
+                <th data-key="price">
+                  Price <span class="sort-arrow"></span>
+                </th>
+                <th data-key="orderStatus">
+                  Order Status <span class="sort-arrow"></span> <br />
+                  <select id="filterStatus" multiple style="width: 100%;">
+                    <option value="Ordered">Ordered</option>
+                    <option value="In Prep">In Prep</option>
+                    <option value="Ready">Ready</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </th>
+                <th data-key="orderDate">
+                  Ordered Date <span class="sort-arrow"></span> <br />
+                  <input type="date" id="filterDateFrom" style="width: 48%;" />
+                  <input type="date" id="filterDateTo" style="width: 48%;" />
+                </th>
+                <th data-key="paymentStatus">
+                  Payment Status <span class="sort-arrow"></span> <br />
+                  <select id="filterPaymentStatus" multiple style="width: 100%;">
+                    <option value="Pending">Pending</option>
+                    <option value="Fully Received">Fully Received</option>
+                    <option value="Partially Received">Partially Received</option>
+                  </select>
+                </th>
+                <th data-key="paymentReceivedDate">
+                  Payment Received Date <span class="sort-arrow"></span>
+                </th>
+                <th data-key="paymentMethod">
+                  Payment Method <span class="sort-arrow"></span>
+                </th>
+                <th data-key="paymentReference">
+                  Payment Reference <span class="sort-arrow"></span>
+                </th>
+                <th data-key="comments">
+                  Suggestions/Instructions <span class="sort-arrow"></span>
+                </th>
+                <th data-key="additionalDetails">
+                  Additional Details <span class="sort-arrow"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Data goes here -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div> 
     

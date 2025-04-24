@@ -1,3 +1,6 @@
+import Handsontable from 'handsontable';
+import 'handsontable/dist/handsontable.full.min.css';
+
 let foodPrices = {};
 let allOrdersData = [];
 let sortColumn = null;
@@ -378,3 +381,166 @@ window.addEventListener('load', () => {
     });
   });
 });
+
+
+const columns = [
+  {
+    data: 'date',
+    type: 'date',
+    dateFormat: 'YYYY-MM-DD',
+    defaultDate: new Date().toISOString().split('T')[0],
+    correctFormat: true
+  },
+  {
+    data: 'item',
+    type: 'text'
+  },
+  {
+    data: 'category',
+    type: 'text'
+  },
+  {
+    data: 'amount',
+    type: 'numeric',
+    numericFormat: {
+      pattern: '0.00'
+    }
+  },
+  {
+    data: 'store',
+    type: 'text'
+  },
+  {
+    data: 'notes',
+    type: 'text'
+  }
+];
+
+const container = document.getElementById('expenseTable');
+const hot = new Handsontable(container, {
+  data: [],
+  columns: columns,
+  colHeaders: ['Date', 'Item', 'Category', 'Amount', 'Store', 'Notes'],
+  rowHeaders: true,
+  contextMenu: true,
+  stretchH: 'all',
+  licenseKey: 'non-commercial-and-evaluation' // Use appropriate license key
+});
+
+document.getElementById('addRow').addEventListener('click', () => {
+  hot.alter('insert_row');
+  const rowIndex = hot.countRows() - 1;
+  hot.setDataAtCell(rowIndex, 0, new Date().toISOString().split('T')[0]);
+});
+
+document.getElementById('removeRow').addEventListener('click', () => {
+  const selected = hot.getSelected();
+  if (selected) {
+    const [startRow] = selected[0];
+    hot.alter('remove_row', startRow);
+  }
+});
+
+function showExpenseTracking() {
+  document.getElementById('expenseTrackingSection').style.display = 'block';
+  document.getElementById('manageOrdersSection').style.display = 'none';
+  loadExpensesTable();
+}
+
+function loadExpensesTable() {
+  const tableContainer = document.getElementById('expenseTable');
+  tableContainer.innerHTML = '';
+
+  const table = document.createElement('table');
+  table.className = 'modern-table';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th>Date</th>
+      <th>Item</th>
+      <th>Category</th>
+      <th>Amount</th>
+      <th>Store</th>
+      <th>Notes</th>
+      <th>Action</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+
+  // Load existing expenses
+  db.collection('Expenses').orderBy('date', 'desc').get().then(snapshot => {
+    snapshot.forEach(doc => {
+      const row = createExpenseRow(doc.data(), doc.id);
+      tbody.appendChild(row);
+    });
+
+    // Add empty new entry row
+    tbody.appendChild(createExpenseRow());
+  });
+
+  tableContainer.appendChild(table);
+}
+
+function createExpenseRow(data = {}, docId = null) {
+  const tr = document.createElement('tr');
+  const today = new Date().toISOString().split('T')[0];
+
+  const date = data.purchaseDate || today;
+  const item = data.item || '';
+  const category = data.category || '';
+  const amount = data.amount || '';
+  const store = data.store || '';
+  const notes = data.notes || '';
+
+  tr.innerHTML = `
+    <td><input type="date" value="${date}" /></td>
+    <td><input type="text" value="${item}" placeholder="Item"/></td>
+    <td><input type="text" value="${category}" placeholder="Category"/></td>
+    <td><input type="number" step="0.01" min="0" value="${amount}" placeholder="0.00" /></td>
+    <td><input type="text" value="${store}" placeholder="Store"/></td>
+    <td><input type="text" value="${notes}" placeholder="Notes"/></td>
+    <td>
+      ${docId ? `<button onclick="deleteExpense('${docId}')">🗑️</button>` : `<button onclick="saveNewExpense(this)">➕</button>`}
+    </td>
+  `;
+
+  return tr;
+}
+
+function saveNewExpense(btn) {
+  const row = btn.closest('tr');
+  const inputs = row.querySelectorAll('input');
+
+  const [date, item, category, amount, store, notes] = [...inputs].map(input => input.value.trim());
+
+  if (!item || !category || !amount) {
+    alert("Please fill in Item, Category, and Amount");
+    return;
+  }
+
+  const newExpense = {
+    date,
+    item,
+    category,
+    amount: parseFloat(amount).toFixed(2),
+    store,
+    notes
+  };
+
+  db.collection('Expenses').add(newExpense).then(() => {
+    showExpenseTracking(); // reload
+  });
+}
+
+function deleteExpense(docId) {
+  if (confirm("Are you sure you want to delete this expense?")) {
+    db.collection('Expenses').doc(docId).delete().then(() => {
+      showExpenseTracking(); // reload
+    });
+  }
+}
+
