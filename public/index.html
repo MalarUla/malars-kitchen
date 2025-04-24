@@ -117,7 +117,7 @@
         <button onclick="renderFilteredOrders()">Search</button>
         <button onclick="resetAllFilters()">Reset Filters</button>
       </div>
-
+      
       <div class="table-container">
         <table id="ordersTable" class="orders-table">
           <thead>
@@ -162,9 +162,9 @@
               <th data-key="paymentStatus">
                 Payment Status <span class="sort-arrow"></span> <br />
                 <select id="filterPaymentStatus" multiple style="width: 100%;">
-                  <option value="Pending">Ordered</option>
-                  <option value="Fully Received">In Prep</option>
-                  <option value="Partially Received">Ready</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Fully Received">Fully Received</option>
+                  <option value="Partially Received">Partially Received</option>
                 </select>
               </th>
               <th data-key="paymentReceivedDate">

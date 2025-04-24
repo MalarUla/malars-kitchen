@@ -145,26 +145,37 @@ footer {
     flex-direction: column;
     text-align: center;
   }
+  #ordersTable th, #ordersTable td {
+    font-size: 12px;
+    padding: 6px;
+  }
 }
 
 .table-container {
-  max-height: 400px;
-  overflow: auto;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-top: 10px;
-}
-.orders-table {
-  border-collapse: collapse;
+  overflow-x: auto;
   width: 100%;
-  min-width: 1000px;
 }
-.orders-table th, .orders-table td {
+
+#ordersTable {
+  min-width: 1000px; /* You can tweak this based on how many columns you have */
+  border-collapse: collapse;
+}
+
+.orders-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f4f4f4;
+  z-index: 2;
+}
+
+.orders-table th,
+.orders-table td {
   padding: 8px 12px;
   border: 1px solid #ddd;
   text-align: left;
-  white-space: nowrap;
+  white-space: nowrap; /* ensures content stays in one line */
 }
+
 .orders-table th {
   background-color: #f4f4f4;
   cursor: pointer;
