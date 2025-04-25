@@ -165,3 +165,62 @@ function saveCellValue(input, cell) {
         cell.innerText = '';  // If input is empty, reset to original text
     }
 }
+
+
+function openAddExpensePopup() {
+    document.getElementById("addExpenseModal").style.display = "block";
+    document.getElementById("modalOverlay").style.display = "block";
+}
+
+function closeAddExpensePopup() {
+    document.getElementById("addExpenseModal").style.display = "none";
+    document.getElementById("modalOverlay").style.display = "none";
+
+    // Clear form fields
+    document.getElementById("addItem").value = '';
+    document.getElementById("addCategory").value = '';
+    document.getElementById("addAmount").value = '';
+    document.getElementById("addStore").value = '';
+    document.getElementById("addComments").value = '';
+
+    // Refresh the table from backend
+    fetchAndRenderExpenses();
+}
+
+async function submitNewExpense() {
+    const item = document.getElementById("addItem").value.trim();
+    const category = document.getElementById("addCategory").value.trim();
+    const amount = parseFloat(document.getElementById("addAmount").value);
+    const store = document.getElementById("addStore").value.trim();
+    const comments = document.getElementById("addComments").value.trim();
+
+    if (!item || !category || isNaN(amount)) {
+        alert("Item, Category and valid Amount are required.");
+        return;
+    }
+
+    try {
+        await db.collection('Expense').add({
+            item,
+            category,
+            amount,
+            store,
+            comments,
+            purchaseDate: firebase.firestore.Timestamp.fromDate(new Date())
+        });
+
+        // Clear the fields for next entry but keep modal open
+        document.getElementById("addItem").value = '';
+        document.getElementById("addCategory").value = '';
+        document.getElementById("addAmount").value = '';
+        document.getElementById("addStore").value = '';
+        document.getElementById("addComments").value = '';
+
+        // Refresh table
+        await fetchAndRenderExpenses();
+
+    } catch (error) {
+        console.error("Error adding expense:", error);
+        alert("Failed to add expense.");
+    }
+}

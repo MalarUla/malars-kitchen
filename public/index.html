@@ -117,7 +117,33 @@
 
       <div class="search-controls">
         <button id="saveButton" onclick="saveExpenses()">Save</button>
+        <button id="newExpenseButton" onclick="openAddExpensePopup()">Add Expense</button>
       </div>
+
+      <!-- Add Expense Modal -->
+      <div id="addExpenseModal" class="modal">
+        <h3>Add Expense</h3>
+        <label>Item:</label><br>
+        <input type="text" id="addItem"><br><br>
+
+        <label>Category:</label><br>
+        <input type="text" id="addCategory"><br><br>
+
+        <label>Amount:</label><br>
+        <input type="number" step="0.01" id="addAmount"><br><br>
+
+        <label>Store:</label><br>
+        <input type="text" id="addStore"><br><br>
+
+        <label>Comments:</label><br>
+        <input type="text" id="addComments"><br><br>
+
+        <button onclick="submitNewExpense()">Submit</button>
+        <button onclick="closeAddExpensePopup()">Cancel</button>
+      </div>
+
+      <!-- Optional overlay (dim background) -->
+      <div id="modalOverlay" class="modal-overlay"></div>
 
       <div class="table-wrapper">
         <div class="table-scroll">
