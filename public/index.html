@@ -41,6 +41,8 @@
 
   <!-- Your app's logic -->
   <script src="script.js"></script>
+  <!-- Expense UI and logic -->
+  <script src="expense.js"></script>
 
 </head>
 <body>
@@ -55,10 +57,10 @@
       <h2>Login</h2>
       <form id="loginForm">
         <label for="loginUsername">Username*</label>
-        <input type="text" id="loginUsername" autocomplete="off" required>
+        <input type="text" id="loginUsername" value="malar" autocomplete="off" required>
     
         <label for="loginPassword">Password*</label>
-        <input type="password" id="loginPassword" autocomplete="off" required>
+        <input type="password" id="loginPassword" value="MyPass@987" autocomplete="off" required>
     
         <button type="button" onclick="loginUser()">Login</button>
       </form>
@@ -112,7 +114,41 @@
     
     <div id="expenseTrackingSection" style="display: none; margin-top: 20px;">
       <h3>Expense Tracking</h3>
-      <div id="expenseTable"></div>
+
+      <div class="search-controls">
+        <button id="saveButton" onclick="saveExpenses()">Save</button>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table id="expenseTable" class="modern-table">
+            <thead>
+              <tr>
+                <th data-key="date"> Purchase Date
+                </th>
+                <th data-key="item">
+                  Item 
+                </th>
+                <th data-key="category">
+                  Category
+                </th>
+                <th data-key="amount">
+                  Amount
+                </th>
+                <th data-key="store">
+                  Store
+                </th>
+                <th data-key="comments">
+                  comments
+                </th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+              <!-- Data goes here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div id="manageOrdersSection" style="display: none; margin-top: 20px;">
