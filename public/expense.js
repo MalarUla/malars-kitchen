@@ -70,6 +70,7 @@ function renderExpenseTable(expense) {
       const amount = expense.amount ? '$' + expense.amount.toFixed(2) : '';
   
       row.innerHTML = `
+        <td><input type="checkbox" class="expenseCheckbox" data-id="${expense.id}" onchange="toggleDeleteButton()"></td>
         <td>${purchaseDate}</td>
         <td>${expense.item || ''}</td>
         <td>${expense.category || ''}</td>
@@ -79,6 +80,8 @@ function renderExpenseTable(expense) {
       `;
       tableBody.appendChild(row);
     });
+
+    toggleDeleteButton();
 }
 
 // Function to save the changes to Firestore
@@ -224,3 +227,36 @@ async function submitNewExpense() {
         alert("Failed to add expense.");
     }
 }
+
+function toggleDeleteButton() {
+    const checkboxes = document.querySelectorAll('.expenseCheckbox:checked');
+    const deleteBtn = document.getElementById('deleteExpenseButton');
+    deleteBtn.disabled = checkboxes.length === 0;
+}  
+
+function confirmDeleteExpenses() {
+    if (confirm("Are you sure you want to delete the expense(s)?")) {
+      deleteSelectedExpenses();
+    }
+}
+
+async function deleteSelectedExpenses() {
+    const checkboxes = document.querySelectorAll('.expenseCheckbox:checked');
+    const idsToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-id'));
+  
+    try {
+      const batch = db.batch();
+      idsToDelete.forEach(id => {
+        const ref = db.collection('Expense').doc(id);
+        batch.delete(ref);
+      });
+  
+      await batch.commit();
+      alert("Selected expenses deleted successfully.");
+      fetchAndRenderExpenses(); // Refresh table
+    } catch (error) {
+      console.error("Error deleting expenses:", error);
+      alert("Failed to delete selected expenses.");
+    }  
+}
+    

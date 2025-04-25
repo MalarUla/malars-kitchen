@@ -118,6 +118,7 @@
       <div class="search-controls">
         <button id="saveButton" onclick="saveExpenses()">Save</button>
         <button id="newExpenseButton" onclick="openAddExpensePopup()">Add Expense</button>
+        <button id="deleteExpenseButton" disabled onclick="confirmDeleteExpenses()">Delete Expense</button>
       </div>
 
       <!-- Add Expense Modal -->
@@ -150,6 +151,7 @@
           <table id="expenseTable" class="modern-table">
             <thead>
               <tr>
+                <th>Select</th>
                 <th data-key="date"> Purchase Date
                 </th>
                 <th data-key="item">
