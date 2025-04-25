@@ -86,38 +86,40 @@ async function saveExpenses() {
     const table = document.getElementById("expenseTableBody");
     const rows = table.getElementsByTagName("tr");
 
-    const updatedExpenses = [];
+    const batch = db.batch();
+    let updatesMade = false;
 
-    // Loop through each row and extract the updated data
-    for (let row of rows) {
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         const cells = row.getElementsByTagName("td");
-        
-        const updatedExpense = {
-            purchaseDate: cells[0].innerText, // assuming first cell is the purchase date
-            item: cells[1].innerText,
-            category: cells[2].innerText,
-            amount: parseFloat(cells[3].innerText.replace('$', '').trim()), // Convert to float, remove "$"
-            store: cells[4].innerText,
-            comments: cells[5].innerText
-        };
 
-        updatedExpenses.push(updatedExpense);
+        const originalComment = allExpenseData[i]?.comments || '';
+        const newComment = cells[5].innerText.trim();
+
+        // Only update if comment changed
+        if (originalComment !== newComment) {
+            const docId = allExpenseData[i]?.id;
+            if (docId) {
+                const expenseRef = db.collection('Expense').doc(docId);
+                batch.update(expenseRef, { comments: newComment });
+                updatesMade = true;
+            } else {
+                console.warn(`Skipping row ${i} — missing document ID.`);
+            }
+        }
     }
 
-    // Now save the updated data back to Firestore
+    if (!updatesMade) {
+        alert("No changes to save.");
+        return;
+    }
+
     try {
-        const batch = db.batch(); // Batch writes are more efficient when making multiple updates
-
-        updatedExpenses.forEach((expense, index) => {
-            const expenseRef = db.collection('Expense').doc(allExpenseData[index].id); // Assuming `id` exists in your data
-            batch.update(expenseRef, expense);
-        });
-
-        await batch.commit(); // Commit the batch update to Firestore
-        alert("Expenses saved successfully!");
+        await batch.commit();
+        alert("Comments updated successfully!");
     } catch (error) {
-        console.error("Error saving expenses:", error);
-        alert("Error saving expenses.");
+        console.error("Error saving comments:", error);
+        alert("Error saving comments.");
     }
 }
 
@@ -125,29 +127,32 @@ async function saveExpenses() {
 document.addEventListener('DOMContentLoaded', () => {
     const table = document.getElementById('expenseTable');
     if (table) {
-      table.addEventListener('click', (event) => {
-        const cell = event.target;
-        if (cell.tagName === 'TD' && !cell.hasAttribute('contenteditable')) {
-          const originalText = cell.innerText;
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.value = originalText;
-          input.style.width = '100%';  // Make input match the cell size
-          input.addEventListener('blur', () => saveCellValue(input, cell));  // Save value when focus is lost
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              saveCellValue(input, cell);
+        table.addEventListener('click', (event) => {
+            const cell = event.target;
+
+            // Only allow editing of the 6th column (index 5, i.e. 'Comments')
+            const columnIndex = cell.cellIndex;
+            if (cell.tagName === 'TD' && columnIndex === 5 && !cell.hasAttribute('contenteditable')) {
+                const originalText = cell.innerText;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = originalText;
+                input.style.width = '100%';
+
+                input.addEventListener('blur', () => saveCellValue(input, cell));
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        saveCellValue(input, cell);
+                    }
+                });
+
+                cell.innerHTML = '';
+                cell.appendChild(input);
+                input.focus();
             }
-          });
-          
-          // Replace cell content with input field
-          cell.innerHTML = '';
-          cell.appendChild(input);
-          input.focus();
-        }
-      });
+        });
     } else {
-      console.error("Table not found!");
+        console.error("Table not found!");
     }
 });
 
@@ -159,4 +164,4 @@ function saveCellValue(input, cell) {
     } else {
         cell.innerText = '';  // If input is empty, reset to original text
     }
-}  
+}
