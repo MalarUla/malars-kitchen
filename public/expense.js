@@ -97,7 +97,7 @@ async function saveExpenses() {
         const cells = row.getElementsByTagName("td");
 
         const originalComment = allExpenseData[i]?.comments || '';
-        const newComment = cells[5].innerText.trim();
+        const newComment = cells[6].innerText.trim();
 
         // Only update if comment changed
         if (originalComment !== newComment) {
@@ -133,9 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
         table.addEventListener('click', (event) => {
             const cell = event.target;
 
-            // Only allow editing of the 6th column (index 5, i.e. 'Comments')
+            // Only allow editing of the 7th column (index 6, i.e. 'Comments')
             const columnIndex = cell.cellIndex;
-            if (cell.tagName === 'TD' && columnIndex === 5 && !cell.hasAttribute('contenteditable')) {
+            if (cell.tagName === 'TD' && columnIndex === 6 && !cell.hasAttribute('contenteditable')) {
                 const originalText = cell.innerText;
                 const input = document.createElement('input');
                 input.type = 'text';
