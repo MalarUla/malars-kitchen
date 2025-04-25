@@ -21,6 +21,7 @@ async function fetchAndRenderExpenses() {
   
       snapshot.forEach(doc => {
         const data = doc.data();
+        data.id = doc.id; // Add document ID to data
         allExpenseData.push(data);
       });
   
