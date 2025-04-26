@@ -43,6 +43,8 @@
   <script src="script.js"></script>
   <!-- Expense UI and logic -->
   <script src="expense.js"></script>
+  <!-- Admin Controls UI and logic -->
+  <script src="admin.js"></script>
 
 </head>
 <body>
@@ -111,6 +113,54 @@
       <button onclick="showExpenseTracking()">Expense Tracking</button>
       <button onclick="showAdminControls()">Admin Controls</button>
     </section>
+
+    <div id="adminControlsSection" style="display: none; margin-top: 20px;">
+      <h3>Admin Controls</h3>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    
+        <!-- Manage Food Items Table -->
+        <div style="flex: 1; min-width: 300px;">
+          <h4>Manage Food Items</h4>
+          <div class="table-wrapper">
+            <div class="table-scroll">
+              <table id="foodItemsTable" class="modern-table" style="table-layout: auto; width: 100%; min-width: unset;">
+                <thead>
+                  <tr>
+                    <th style="width: 150px;">Name</th>
+                    <th style="width: 100px;">Price</th>
+                  </tr>
+                </thead>
+                <tbody id="foodItemsTableBody">
+                  <!-- Food items will load here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Manage Expense Items Table -->
+        <div style="flex: 1; min-width: 300px;">
+          <h4>Manage Expense Categories</h4>
+          <div class="table-wrapper">
+            <div class="table-scroll">
+              <table id="expenseItemsTable" class="modern-table" style="table-layout: auto; width: 100%; min-width: unset;">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Item</th>
+                    <th style="width: 100px;">Category</th>
+                  </tr>
+                </thead>
+                <tbody id="expenseItemsTableBody">
+                  <!-- Expense items will load here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>    
+     
     
     <div id="expenseTrackingSection" style="display: none; margin-top: 20px;">
       <h3>Expense Tracking</h3>
@@ -129,24 +179,39 @@
 
       <!-- Add Expense Modal -->
       <div id="addExpenseModal" class="modal">
-        <h3>Add Expense</h3>
-        <label>Item:</label><br>
-        <input type="text" id="addItem"><br><br>
+        <div class="modal-header">
+          <h2>Add Expense</h2>
+          <img src="images/Logo.png" alt="Company Logo" class="company-logo">
+        </div>
 
-        <label>Category:</label><br>
-        <input type="text" id="addCategory"><br><br>
-
-        <label>Amount:</label><br>
-        <input type="number" step="0.01" id="addAmount"><br><br>
-
-        <label>Store:</label><br>
-        <input type="text" id="addStore"><br><br>
-
-        <label>Comments:</label><br>
-        <input type="text" id="addComments"><br><br>
-
-        <button onclick="submitNewExpense()">Submit</button>
-        <button onclick="closeAddExpensePopup()">Cancel</button>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="addItem">Item</label>
+            <select id="addItem" onchange="populateCategory()" required>
+              <option value="">-- Select Item --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="addCategory">Category</label>
+            <input type="text" id="addCategory" readonly>
+          </div>
+          <div class="form-group">
+            <label for="addAmount">Amount</label>
+            <input type="number" step="0.01" id="addAmount">
+          </div>
+          <div class="form-group">
+            <label for="addStore">Store</label>
+            <input type="text" id="addStore">
+          </div>
+          <div class="form-group">
+            <label for="addComments">Comments</label>
+            <input type="text" id="addComments">
+          </div>
+          <div class="button-group">
+            <button onclick="submitNewExpense()" class="submit-btn">Submit</button>
+            <button onclick="closeAddExpensePopup()" class="cancel-btn">Cancel</button>
+          </div>
+        </div>
       </div>
 
       <!-- Optional overlay (dim background) -->

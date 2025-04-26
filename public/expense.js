@@ -1,8 +1,10 @@
 let allExpenseData = [];
 let editedExpenseIds = new Set();
+let itemCategoryMap = {}; // to hold item -> category mapping
 
 function showExpenseTracking() {
     document.getElementById('expenseTrackingSection').style.display = 'block';
+    document.getElementById('adminControlsSection').style.display = 'block';
     document.getElementById('manageOrdersSection').style.display = 'none';
 
     // Fetch orders only once, if not loaded
@@ -11,7 +13,6 @@ function showExpenseTracking() {
     } else {
         renderFilteredExpenses();
     }
-
 }
 
 async function fetchAndRenderExpenses() {
@@ -216,24 +217,47 @@ function saveCellValue(input, cell) {
 
 
 function openAddExpensePopup() {
-    document.getElementById("addExpenseModal").style.display = "block";
-    document.getElementById("modalOverlay").style.display = "block";
+  const modal = document.getElementById("addExpenseModal");
+  const overlay = document.getElementById("modalOverlay");
+
+  modal.style.display = "block";
+  overlay.style.display = "block";
+
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10); // small delay to trigger transition
+
+  if (Object.keys(itemCategoryMap).length === 0) {
+    loadItemCategoryMaster();
+  }
 }
+
 
 function closeAddExpensePopup() {
-    document.getElementById("addExpenseModal").style.display = "none";
-    document.getElementById("modalOverlay").style.display = "none";
+  const modal = document.getElementById("addExpenseModal");
+  const overlay = document.getElementById("modalOverlay");
 
-    // Clear form fields
-    document.getElementById("addItem").value = '';
-    document.getElementById("addCategory").value = '';
-    document.getElementById("addAmount").value = '';
-    document.getElementById("addStore").value = '';
-    document.getElementById("addComments").value = '';
+  // Start fade-out animation
+  modal.classList.remove('show');
 
-    // Refresh the table from backend
-    fetchAndRenderExpenses();
+  setTimeout(() => {
+      modal.style.display = "none";
+      overlay.style.display = "none";
+
+      // Clear form fields AFTER closing
+      const addItemInput = document.getElementById("addItem") || document.getElementById("addItemSearch");
+      if (addItemInput) addItemInput.value = '';
+
+      document.getElementById("addCategory").value = '';
+      document.getElementById("addAmount").value = '';
+      document.getElementById("addStore").value = '';
+      document.getElementById("addComments").value = '';
+
+      // Refresh the table from backend
+      fetchAndRenderExpenses();
+  }, 400); // Wait for fade-out transition to finish
 }
+
 
 async function submitNewExpense() {
     const item = document.getElementById("addItem").value.trim();
@@ -367,4 +391,34 @@ async function refreshGoogleSheet() {
       alert("An error occurred while updating Google Sheet.");
     }
 }
-  
+
+
+function loadItemCategoryMaster() {
+  const itemSelect = document.getElementById('addItem');
+  itemSelect.innerHTML = '<option value="">-- Select Item --</option>'; // reset dropdown
+
+  db.collection("ItemCategoryMaster")
+      .get()
+      .then(snapshot => {
+          snapshot.forEach(doc => {
+              const data = doc.data();
+              itemCategoryMap[data.item] = data.category;
+
+              const option = document.createElement('option');
+              option.value = data.item;
+              option.textContent = data.item;
+              itemSelect.appendChild(option);
+          });
+      })
+      .catch(error => {
+          console.error("Error loading ItemCategoryMaster:", error);
+      });
+}
+
+function populateCategory() {
+    const itemSelect = document.getElementById('addItem');
+    const categoryInput = document.getElementById('addCategory');
+    const selectedItem = itemSelect.value;
+
+    categoryInput.value = itemCategoryMap[selectedItem] || '';
+}

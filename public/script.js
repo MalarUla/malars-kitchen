@@ -40,6 +40,12 @@ async function loginUser() {
       document.querySelector('.menu-section').style.display = 'none';
       document.getElementById('adminMenu').style.display = 'block';
 
+        // 👉 Hide the footer after login
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.style.display = 'none';
+      }
+
     } else {
       showToast('Invalid credentials.', 'error');
     }
@@ -67,6 +73,7 @@ function logoutUser() {
 function showManageOrders() {
   document.getElementById("manageOrdersSection").style.display = 'block';
   document.getElementById('expenseTrackingSection').style.display = 'none';
+  document.getElementById('adminControlsSection').style.display = 'block';
   // Fetch orders only once, if not loaded
   if (allOrdersData.length === 0) {
     fetchAndRenderOrders();
