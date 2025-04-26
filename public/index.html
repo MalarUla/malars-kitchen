@@ -115,15 +115,16 @@
     <div id="expenseTrackingSection" style="display: none; margin-top: 20px;">
       <h3>Expense Tracking</h3>
 
-      <div class="search-controls">
-        <button id="saveButton" onclick="saveExpenses()">Save</button>
-        <button id="newExpenseButton" onclick="openAddExpensePopup()">Add Expense</button>
-        <button id="deleteExpenseButton" disabled onclick="confirmDeleteExpenses()">Delete Expense</button>
-      </div>
-
-      <div class="expense-actions">
-        <button id="exportCSVBtn">Export CSV</button>
-        <button id="refreshGoogleSheetBtn">Refresh Google Sheet</button>
+      <div class="expense-actions-row">
+        <div class="left-actions">
+          <button id="newExpenseButton" onclick="openAddExpensePopup()">Add Expense</button>
+          <button id="saveButton" disabled onclick="saveExpenses()">Save</button>
+          <button id="deleteExpenseButton" disabled onclick="confirmDeleteExpenses()">Delete Expense</button>
+        </div>
+        <div class="right-actions">
+          <button id="exportCSVBtn">Export CSV</button>
+          <button id="refreshGoogleSheetBtn">Refresh Google Sheet</button>
+        </div>
       </div>
 
       <!-- Add Expense Modal -->

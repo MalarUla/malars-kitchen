@@ -1,5 +1,5 @@
 let allExpenseData = [];
-
+let editedExpenseIds = new Set();
 
 function showExpenseTracking() {
     document.getElementById('expenseTrackingSection').style.display = 'block';
@@ -86,6 +86,10 @@ function renderExpenseTable(expense) {
 
 // Function to save the changes to Firestore
 async function saveExpenses() {
+
+    const saveButton = document.getElementById('saveButton');
+    saveButton.disabled = true;
+
     const table = document.getElementById("expenseTableBody");
     const rows = table.getElementsByTagName("tr");
 
@@ -123,8 +127,34 @@ async function saveExpenses() {
     } catch (error) {
         console.error("Error saving comments:", error);
         alert("Error saving comments.");
+        saveButton.disabled = false;
     }
 }
+
+/*function saveExpenses() {
+    const saveButton = document.getElementById('saveButton');
+    saveButton.disabled = true;
+
+    const updates = [];
+
+    editedExpenseIds.forEach(docId => {
+        const row = document.querySelector(`tr[data-id="${docId}"]`);
+        const comments = row.cells[6].innerText.trim();
+
+        updates.push(updateDoc(doc(db, 'Expense', docId), { comments }));
+    });
+
+    Promise.all(updates)
+        .then(() => {
+            editedExpenseIds.clear();
+            loadExpenses(); // refresh table
+        })
+        .catch(error => {
+            console.error("Error saving expenses:", error);
+            saveButton.disabled = false;
+        });
+}*/
+
 
 // Function to make table cell editable
 document.addEventListener('DOMContentLoaded', () => {
@@ -173,11 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // Save edited value back to the cell
 function saveCellValue(input, cell) {
     const newValue = input.value.trim();
-    if (newValue !== '') {
-        cell.innerText = newValue;
-    } else {
-        cell.innerText = '';  // If input is empty, reset to original text
+    const row = cell.closest('tr');
+    const docId = row.getAttribute('data-id');
+
+    if (cell.innerText !== newValue) {
+        editedExpenseIds.add(docId);
+        document.getElementById('saveButton').disabled = false;
     }
+
+    cell.innerHTML = newValue;
 }
 
 

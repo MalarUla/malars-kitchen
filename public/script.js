@@ -59,6 +59,7 @@ function logoutUser() {
   document.querySelector('.menu-section').style.display = 'block';
   document.getElementById('adminMenu').style.display = 'none';    
   document.getElementById('manageOrdersSection').style.display = 'none';
+  document.getElementById('expenseTrackingSection').style.display = 'none';
 
   showToast('Logged out successfully.', 'success');
 }
