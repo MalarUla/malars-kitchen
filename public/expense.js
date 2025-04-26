@@ -157,6 +157,17 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("Table not found!");
     }
+
+    // ✅ Add export and Google Sheet refresh button event listeners here:
+    const exportBtn = document.getElementById('exportCSVBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportExpensesToCSV);
+    }
+
+    const refreshSheetBtn = document.getElementById('refreshGoogleSheetBtn');
+    if (refreshSheetBtn) {
+        refreshSheetBtn.addEventListener('click', refreshGoogleSheet);
+    }
 });
 
 // Save edited value back to the cell
@@ -260,3 +271,66 @@ async function deleteSelectedExpenses() {
     }  
 }
     
+function exportExpensesToCSV() {
+    if (allExpenseData.length === 0) {
+      alert("No expense data available to export.");
+      return;
+    }
+  
+    const headers = ["Purchase Date", "Item", "Category", "Amount", "Store", "Comments"];
+    const rows = allExpenseData.map(expense => [
+      expense.purchaseDate?.toDate ? expense.purchaseDate.toDate().toLocaleDateString() : '',
+      expense.item || '',
+      expense.category || '',
+      expense.amount ? expense.amount.toFixed(2) : '',
+      expense.store || '',
+      expense.comments || ''
+    ]);
+  
+    let csvContent = "data:text/csv;charset=utf-8," 
+      + headers.join(",") + "\n"
+      + rows.map(e => e.map(field => `"${field.replace(/"/g, '""')}"`).join(",")).join("\n");
+  
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "malarskitchen_expenses.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+async function refreshGoogleSheet() {
+    if (allExpenseData.length === 0) {
+      alert("No expense data available to export.");
+      return;
+    }
+  
+    const dataToSend = allExpenseData.map(expense => ({
+      purchaseDate: expense.purchaseDate?.toDate ? expense.purchaseDate.toDate().toLocaleDateString() : '',
+      item: expense.item || '',
+      category: expense.category || '',
+      amount: expense.amount ? expense.amount.toFixed(2) : '',
+      store: expense.store || '',
+      comments: expense.comments || ''
+    }));
+  
+    try {
+      const response = await fetch("YOUR_WEB_APP_URL", {
+        method: "POST",
+        contentType: "application/json",
+        body: JSON.stringify(dataToSend)
+      });
+  
+      if (response.ok) {
+        alert("Google Sheet updated successfully.");
+      } else {
+        alert("Failed to update Google Sheet.");
+      }
+    } catch (error) {
+      console.error("Error updating Google Sheet:", error);
+      alert("An error occurred while updating Google Sheet.");
+    }
+}
+  

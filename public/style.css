@@ -293,3 +293,22 @@ table.orders-table th {
   width: 300px;
 }
 
+
+.expense-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.expense-actions button {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.expense-actions button:hover {
+  background-color: #e0e0e0;
+}
+
