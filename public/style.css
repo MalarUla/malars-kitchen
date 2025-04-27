@@ -284,6 +284,16 @@ table.orders-table th {
   border-radius: 8px;
 }
 
+.fade {
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+.fade.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
 
 /* Overlay behind modal */
 .modal-overlay {

@@ -52,8 +52,16 @@ async function loginUser() {
 
       hideLoginForm(); // ✅ Close modal after successful login
 
-      document.getElementById("logoutBtn").style.display = 'block';
-      document.getElementById('loginBtn').style.display = 'none';
+      const loginBtn = document.getElementById('loginBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      
+      // First make sure both buttons are "displayed"
+      loginBtn.style.display = 'inline-block';
+      logoutBtn.style.display = 'inline-block';
+      
+      // Now fade
+      loginBtn.classList.add('hidden');
+      logoutBtn.classList.remove('hidden');
       
       // Show admin menu only
       document.querySelector('.form-section').style.display = 'none';
@@ -77,8 +85,16 @@ async function loginUser() {
 
 function logoutUser() {
   localStorage.removeItem('loggedInUser');
-  document.getElementById("loginBtn").style.display = 'block';
-  document.getElementById("logoutBtn").style.display = 'none';
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  
+  // Make sure both buttons are "displayed"
+  loginBtn.style.display = 'inline-block';
+  logoutBtn.style.display = 'inline-block';
+  
+  // Now fade
+  loginBtn.classList.remove('hidden');
+  logoutBtn.classList.add('hidden');
 
   // Reset UI on logout
   document.querySelector('.form-section').style.display = 'block';    
