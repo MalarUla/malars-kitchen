@@ -64,9 +64,12 @@ async function loginUser() {
       logoutBtn.classList.remove('hidden');
       
       // Show admin menu only
-      document.querySelector('.form-section').style.display = 'none';
-      document.querySelector('.menu-section').style.display = 'none';
-      document.getElementById('adminMenu').style.display = 'block';
+        // Hide the menu and order sections
+      document.getElementById('menu-section').style.display = 'none';   // Hide menu section
+      document.getElementById('order-section').style.display = 'none';  // Hide order section
+
+      // Show the admin menu
+      document.getElementById('adminMenu').style.display = 'block';  // Display admin menu
 
         // 👉 Hide the footer after login
       const footer = document.querySelector('footer');
@@ -97,9 +100,9 @@ function logoutUser() {
   logoutBtn.classList.add('hidden');
 
   // Reset UI on logout
-  document.querySelector('.form-section').style.display = 'block';    
-  document.querySelector('.menu-section').style.display = 'block';
-  document.getElementById('adminMenu').style.display = 'none';    
+  document.getElementById('menu-section').style.display = 'block'; 
+  document.getElementById('order-section').style.display = 'block';
+  document.getElementById('adminMenu').style.display = 'none';   
 
   document.getElementById('manageOrdersSection').style.display = 'none';
   document.getElementById('expenseTrackingSection').style.display = 'none';
@@ -317,7 +320,18 @@ function renderMenuCards(data) {
   data.forEach(item => {
     const card = document.createElement('div');
     card.className = 'menu-card';
-    card.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;
+    // Generate the image name by replacing spaces with underscores and converting to lowercase
+    const imageName = item.name.replace(/[\s/]+/g, '_').toLowerCase() + '.png';
+    console.log(imageName)
+    const imageUrl = `images/${imageName}`;
+
+    card.innerHTML = `
+      <img src="${imageUrl}" alt="${item.name}" class="menu-card-img">
+      <div class="menu-card-info">
+        <strong>${item.name}</strong><br>
+        ₹${item.price}
+      </div>
+    `;
     container.appendChild(card);
   });
 }

@@ -79,43 +79,47 @@
       </div>
     </div>
 
-    <section class="form-section">
-      <h2>Place Your Order</h2>
-      <form id="orderForm">
-        <label for="customerName">Customer Name*</label>
-        <input type="text" id="customerName" required>
-
-        <label for="contactEmail">Contact Email (optional)</label>
-        <input type="email" id="contactEmail">
-
-        <label for="contactPhone">Contact Phone*</label>
-        <input type="text" id="contactPhone" required>
-
-        <label for="foodItem">Food Item*</label>
-        <select id="foodItem" onchange="calculatePrice()" required>
-          <option value="">Select</option>
-        </select>
-
-        <label for="quantity">Quantity*</label>
-        <input type="number" id="quantity" value="1" min="1" onchange="calculatePrice()" required>
-
-        <label for="price">Price</label>
-        <input type="text" id="price" disabled>
-
-        <label for="comments">Comments / Suggestions</label>
-        <textarea id="comments"></textarea>
-
-        <button type="button" onclick="submitOrder()">Submit</button>
-      </form>
-    </section>
-
-    <section class="menu-section">
-      <h2>Our Menu</h2>
-      <input type="text" id="menuFilter" placeholder="Search food...">
-      <div class="menu-cards" id="menuCards">
-        <!-- Cards will be generated dynamically if needed -->
+    <div id="main-content">
+  
+      <div id="menu-section">
+        <h2>Our Menu</h2>
+        <input type="text" id="menuFilter" placeholder="Search food...">
+        <div class="menu-cards" id="menuCards">
+          <!-- Cards will be generated dynamically if needed -->
+        </div>
       </div>
-    </section>
+    
+      <div id="order-section">
+        <h2>Place Your Order</h2>
+        <form id="orderForm">
+          <label for="customerName">Customer Name*</label>
+          <input type="text" id="customerName" required>
+  
+          <label for="contactEmail">Contact Email (optional)</label>
+          <input type="email" id="contactEmail">
+  
+          <label for="contactPhone">Contact Phone*</label>
+          <input type="text" id="contactPhone" required>
+  
+          <label for="foodItem">Food Item*</label>
+          <select id="foodItem" onchange="calculatePrice()" required>
+            <option value="">Select</option>
+          </select>
+  
+          <label for="quantity">Quantity*</label>
+          <input type="number" id="quantity" value="1" min="1" onchange="calculatePrice()" required>
+  
+          <label for="price">Price</label>
+          <input type="text" id="price" disabled>
+  
+          <label for="comments">Comments / Suggestions</label>
+          <textarea id="comments"></textarea>
+  
+          <button type="button" onclick="submitOrder()">Submit</button>
+        </form>
+      </div>
+    
+    </div>
 
     <section id="adminMenu" style="display: none;">
       <h2>Admin Menu</h2>

@@ -448,3 +448,38 @@ table.orders-table th {
 }
 
 
+#main-content {
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+}
+
+#menu-section, #order-section {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  flex: 1;
+}
+
+.menu-card-img {
+  width: 100%;  /* Image takes up the full width of the card */
+  max-width: 180px;  /* Adjust this size to control the image width */
+  height: auto;  /* Maintain aspect ratio */
+  border-radius: 8px;  /* Optional: rounded corners for the image */
+}
+
+.menu-card-info {
+  margin-top: 10px;  /* Space between the image and text */
+}
+
+.menu-card-info strong {
+  display: block;  /* Ensure the name and price are stacked on top of each other */
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.menu-card-info {
+  font-size: 14px;  /* Adjust the font size for price */
+  color: #333;
+}
