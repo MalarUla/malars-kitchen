@@ -51,23 +51,33 @@
   <header>
     <img src="images/Logo.png" alt="Malar's Kitchen Logo" class="logo">
     <h1>Malar's Kitchen</h1>
-    <button id="toggleTheme">Toggle Theme</button>
+    <button id="loginBtn" onclick="showLoginForm()">Login</button>
+    <button id="logoutBtn" onclick="logoutUser()" style="display: none;">Logout</button>
   </header>
 
+
   <main>
-    <section class="auth-section">
+
+    <!-- Login Modal -->
+    <div id="loginFormDiv" style="display: none; padding: 20px; border: 1px solid #ccc; margin-top: 20px;">
       <h2>Login</h2>
-      <form id="loginForm">
-        <label for="loginUsername">Username*</label>
-        <input type="text" id="loginUsername" value="malar" autocomplete="off" required>
-    
-        <label for="loginPassword">Password*</label>
-        <input type="password" id="loginPassword" value="MyPass@987" autocomplete="off" required>
-    
-        <button type="button" onclick="loginUser()">Login</button>
-      </form>
-      <button id="logoutBtn" onclick="logoutUser()" style="display: none;">Logout</button>
-    </section>
+
+      <div class="form-group">
+        <label for="loginUsername">Username:</label>
+        <input type="text" value="malar" id="loginUsername" autocomplete="off" required>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password:</label>
+        <input type="password" value="MyPass@987" id="loginPassword" autocomplete="off" required>
+      </div>
+
+      <p id="loginError" style="color: red; display: none; text-align: center;">Invalid username or password.</p>
+
+      <div class="button-group">
+        <button onclick="loginUser()" class="submit-btn">Login</button>
+        <button onclick="hideLoginForm()" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
 
     <section class="form-section">
       <h2>Place Your Order</h2>

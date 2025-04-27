@@ -4,6 +4,24 @@ let allOrdersData = [];
 let sortColumn = null;
 let sortDirection = 1; // 1 for ascending, -1 for descending
 
+
+function showLoginForm() {
+  console.log("Showing login form...");
+  document.getElementById('loginFormDiv').style.display = 'block';
+}
+
+function hideLoginForm() {
+  console.log("Hiding login form...");
+  document.getElementById('loginFormDiv').style.display = 'none';
+  clearLoginFields();
+}
+
+function clearLoginFields() {
+  document.getElementById("loginUsername").value = "";
+  document.getElementById("loginPassword").value = "";
+  document.getElementById("loginError").style.display = "none";
+}
+
 async function loginUser() {
   const username = document.getElementById("loginUsername").value.trim();
   const password = document.getElementById("loginPassword").value;
@@ -20,7 +38,7 @@ async function loginUser() {
       .get();
 
     if (querySnapshot.empty) {
-      showToast('User not found.', 'error');
+      showLoginError('User not found.');
       return;
     }
 
@@ -32,8 +50,10 @@ async function loginUser() {
       localStorage.setItem('loggedInUser', username);
       showToast('Login successful!', 'success');
 
-      document.getElementById("loginForm").style.display = 'none';
+      hideLoginForm(); // ✅ Close modal after successful login
+
       document.getElementById("logoutBtn").style.display = 'block';
+      document.getElementById('loginBtn').style.display = 'none';
       
       // Show admin menu only
       document.querySelector('.form-section').style.display = 'none';
@@ -57,15 +77,23 @@ async function loginUser() {
 
 function logoutUser() {
   localStorage.removeItem('loggedInUser');
-  document.getElementById("loginForm").style.display = 'block';
+  document.getElementById("loginBtn").style.display = 'block';
   document.getElementById("logoutBtn").style.display = 'none';
 
   // Reset UI on logout
   document.querySelector('.form-section').style.display = 'block';    
   document.querySelector('.menu-section').style.display = 'block';
   document.getElementById('adminMenu').style.display = 'none';    
+
   document.getElementById('manageOrdersSection').style.display = 'none';
   document.getElementById('expenseTrackingSection').style.display = 'none';
+  document.getElementById('adminControlsSection').style.display = 'none';
+
+  // 👉 Hide the footer after login
+  const footer = document.querySelector('footer');
+  if (footer) {
+    footer.style.display = 'block';
+  }
 
   showToast('Logged out successfully.', 'success');
 }
@@ -73,7 +101,7 @@ function logoutUser() {
 function showManageOrders() {
   document.getElementById("manageOrdersSection").style.display = 'block';
   document.getElementById('expenseTrackingSection').style.display = 'none';
-  document.getElementById('adminControlsSection').style.display = 'block';
+  document.getElementById('adminControlsSection').style.display = 'none';
   // Fetch orders only once, if not loaded
   if (allOrdersData.length === 0) {
     fetchAndRenderOrders();
@@ -354,6 +382,7 @@ async function submitOrder() {
 }
 
 window.addEventListener('load', () => {
+  console.log("Page loaded. Checking for logged-in user...");
   
   // Check if Firestore is available before calling loadFoodItems
   if (window.db) {
@@ -365,7 +394,8 @@ window.addEventListener('load', () => {
   // auto-toggle UI based on login
   const user = localStorage.getItem('loggedInUser');
   if (user) {
-    document.getElementById("loginForm").style.display = 'none';
+    console.log("User is logged in:", user);
+    document.getElementById("loginBtn").style.display = 'none';
     document.getElementById("logoutBtn").style.display = 'block';
 
     // Show admin menu only
@@ -375,9 +405,9 @@ window.addEventListener('load', () => {
   }
 
   // Setup theme toggle
-  document.getElementById('toggleTheme').addEventListener('click', () => {
+  /*document.getElementById('toggleTheme').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-  });
+  });*/
 
   // Filter menu items
   document.getElementById('menuFilter').addEventListener('input', function () {

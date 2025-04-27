@@ -5,16 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malar's Kitchen Order Form</title>
   <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+
+  <!-- Firebase SDK (non-modular compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMXhzfmqcoEjI6OGC7N6EdRNA4BqSCNT4",
+      authDomain: "malarskitchen-36ee7.firebaseapp.com",
+      projectId: "malarskitchen-36ee7",
+      storageBucket: "malarskitchen-36ee7.firebasestorage.app",
+      messagingSenderId: "1003666702818",
+      appId: "1:1003666702818:web:06dde0f846b88495e979bb",
+      measurementId: "G-D9XFS6FP0X"
+    };
+
+    try {
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      // Initialize Firestore and make it available globally
+      const db = firebase.firestore();
+      window.db = db;
+
+      firebase.analytics();
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+    }
+  </script>
+
+  <!-- Your app's logic -->
+  <script src="script.js"></script>
+  <!-- Expense UI and logic -->
+  <script src="expense.js"></script>
+  <!-- Admin Controls UI and logic -->
+  <script src="admin.js"></script>
+
 </head>
 <body>
   <header>
     <img src="images/Logo.png" alt="Malar's Kitchen Logo" class="logo">
     <h1>Malar's Kitchen</h1>
-    <button id="toggleTheme">Toggle Theme</button>
+    <!--button id="toggleTheme">Toggle Theme</button-->
   </header>
 
   <main>
+    <section class="auth-section">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="loginUsername">Username*</label>
+        <input type="text" id="loginUsername" value="malar" autocomplete="off" required>
+    
+        <label for="loginPassword">Password*</label>
+        <input type="password" id="loginPassword" value="MyPass@987" autocomplete="off" required>
+    
+        <button type="button" onclick="loginUser()">Login</button>
+      </form>
+      <button id="logoutBtn" onclick="logoutUser()" style="display: none;">Logout</button>
+    </section>
+
     <section class="form-section">
       <h2>Place Your Order</h2>
       <form id="orderForm">
@@ -52,6 +106,233 @@
         <!-- Cards will be generated dynamically if needed -->
       </div>
     </section>
+
+    <section id="adminMenu" style="display: none;">
+      <h2>Admin Menu</h2>
+      <button onclick="showManageOrders()">Manage Orders</button>
+      <button onclick="showExpenseTracking()">Expense Tracking</button>
+      <button onclick="showAdminControls()">Admin Controls</button>
+    </section>
+
+    <div id="adminControlsSection" style="display: none; margin-top: 20px;">
+      <h3>Admin Controls</h3>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    
+        <!-- Manage Food Items Table -->
+        <div style="flex: 1; min-width: 300px;">
+          <h4>Manage Food Items</h4>
+          <div class="table-wrapper">
+            <div class="table-scroll">
+              <table id="foodItemsTable" class="modern-table" style="table-layout: auto; width: 100%; min-width: unset;">
+                <thead>
+                  <tr>
+                    <th style="width: 150px;">Name</th>
+                    <th style="width: 100px;">Price</th>
+                  </tr>
+                </thead>
+                <tbody id="foodItemsTableBody">
+                  <!-- Food items will load here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Manage Expense Items Table -->
+        <div style="flex: 1; min-width: 300px;">
+          <h4>Manage Expense Categories</h4>
+          <div class="table-wrapper">
+            <div class="table-scroll">
+              <table id="expenseItemsTable" class="modern-table" style="table-layout: auto; width: 100%; min-width: unset;">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Item</th>
+                    <th style="width: 100px;">Category</th>
+                  </tr>
+                </thead>
+                <tbody id="expenseItemsTableBody">
+                  <!-- Expense items will load here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>    
+     
+    
+    <div id="expenseTrackingSection" style="display: none; margin-top: 20px;">
+      <h3>Expense Tracking</h3>
+
+      <div class="expense-actions-row">
+        <div class="left-actions">
+          <button id="newExpenseButton" onclick="openAddExpensePopup()">Add Expense</button>
+          <button id="saveButton" disabled onclick="saveExpenses()">Save</button>
+          <button id="deleteExpenseButton" disabled onclick="confirmDeleteExpenses()">Delete Expense</button>
+        </div>
+        <div class="right-actions">
+          <button id="exportCSVBtn">Export CSV</button>
+          <button id="refreshGoogleSheetBtn">Refresh Google Sheet</button>
+        </div>
+      </div>
+
+      <!-- Add Expense Modal -->
+      <div id="addExpenseModal" class="modal">
+        <div class="modal-header">
+          <h2>Add Expense</h2>
+          <img src="images/Logo.png" alt="Company Logo" class="company-logo">
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="addItem">Item</label>
+            <select id="addItem" onchange="populateCategory()" required>
+              <option value="">-- Select Item --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="addCategory">Category</label>
+            <input type="text" id="addCategory" readonly>
+          </div>
+          <div class="form-group">
+            <label for="addAmount">Amount</label>
+            <input type="number" step="0.01" id="addAmount">
+          </div>
+          <div class="form-group">
+            <label for="addStore">Store</label>
+            <input type="text" id="addStore">
+          </div>
+          <div class="form-group">
+            <label for="addComments">Comments</label>
+            <input type="text" id="addComments">
+          </div>
+          <div class="button-group">
+            <button onclick="submitNewExpense()" class="submit-btn">Submit</button>
+            <button onclick="closeAddExpensePopup()" class="cancel-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional overlay (dim background) -->
+      <div id="modalOverlay" class="modal-overlay"></div>
+
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table id="expenseTable" class="modern-table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th data-key="date"> Purchase Date
+                </th>
+                <th data-key="item">
+                  Item 
+                </th>
+                <th data-key="category">
+                  Category
+                </th>
+                <th data-key="amount">
+                  Amount
+                </th>
+                <th data-key="store">
+                  Store
+                </th>
+                <th data-key="comments">
+                  comments
+                </th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+              <!-- Data goes here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="manageOrdersSection" style="display: none; margin-top: 20px;">
+      <h3>Manage Orders</h3>
+
+      <div class="search-controls">
+        <button onclick="renderFilteredOrders()">Search</button>
+        <button onclick="resetAllFilters()">Reset Filters</button>
+      </div>
+      
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table id="ordersTable" class="orders-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" onclick="toggleAllCheckboxes(this)"/></th>
+                <th data-key="name">
+                  Customer <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterCustomer" placeholder="Search..." />
+                </th>
+                <th data-key="phone">
+                  Phone <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterPhone" placeholder="Search..." />
+                </th>
+                <th data-key="email">
+                  email <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterEmail" placeholder="Search..." />
+                </th>
+                <th data-key="item">
+                  Item <span class="sort-arrow"></span> <br />
+                  <input type="text" id="filterItem" placeholder="Search..." />
+                </th>
+                <th data-key="quantity">
+                  Qty <span class="sort-arrow"></span>
+                </th>
+                <th data-key="price">
+                  Price <span class="sort-arrow"></span>
+                </th>
+                <th data-key="orderStatus">
+                  Order Status <span class="sort-arrow"></span> <br />
+                  <select id="filterStatus" multiple style="width: 100%;">
+                    <option value="Ordered">Ordered</option>
+                    <option value="In Prep">In Prep</option>
+                    <option value="Ready">Ready</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </th>
+                <th data-key="orderDate">
+                  Ordered Date <span class="sort-arrow"></span> <br />
+                  <input type="date" id="filterDateFrom" style="width: 48%;" />
+                  <input type="date" id="filterDateTo" style="width: 48%;" />
+                </th>
+                <th data-key="paymentStatus">
+                  Payment Status <span class="sort-arrow"></span> <br />
+                  <select id="filterPaymentStatus" multiple style="width: 100%;">
+                    <option value="Pending">Pending</option>
+                    <option value="Fully Received">Fully Received</option>
+                    <option value="Partially Received">Partially Received</option>
+                  </select>
+                </th>
+                <th data-key="paymentReceivedDate">
+                  Payment Received Date <span class="sort-arrow"></span>
+                </th>
+                <th data-key="paymentMethod">
+                  Payment Method <span class="sort-arrow"></span>
+                </th>
+                <th data-key="paymentReference">
+                  Payment Reference <span class="sort-arrow"></span>
+                </th>
+                <th data-key="comments">
+                  Suggestions/Instructions <span class="sort-arrow"></span>
+                </th>
+                <th data-key="additionalDetails">
+                  Additional Details <span class="sort-arrow"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Data goes here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div> 
+    
   </main>
 
   <div id="toast" class="toast hidden">Order submitted successfully!</div>
@@ -71,6 +352,6 @@
     </div>
     <p style="margin-top: 1rem;">&copy; 2025 Malar's Kitchen. All rights reserved.</p>
   </footer>  
-  
+
 </body>
 </html>

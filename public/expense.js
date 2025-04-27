@@ -4,7 +4,7 @@ let itemCategoryMap = {}; // to hold item -> category mapping
 
 function showExpenseTracking() {
     document.getElementById('expenseTrackingSection').style.display = 'block';
-    document.getElementById('adminControlsSection').style.display = 'block';
+    document.getElementById('adminControlsSection').style.display = 'none';
     document.getElementById('manageOrdersSection').style.display = 'none';
 
     // Fetch orders only once, if not loaded
