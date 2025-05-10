@@ -309,9 +309,9 @@ table.orders-table th {
 
 .modal {
   display: none;
-  position: fixed;
-  top: 10%;
-  left: 50%;
+  position: absolute;
+  top: 20%;
+  left: 20%;
   transform: translateX(-50%);
   background: #fff;
   border: 1px solid #ccc;
@@ -333,6 +333,7 @@ table.orders-table th {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: move;
 }
 
 .modal-header h2 {

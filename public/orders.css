@@ -1,0 +1,224 @@
+/* Main container for search filters */
+.orders-search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Input and select styles */
+.orders-input,
+.orders-select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 160px;
+}
+
+.orders-btn {
+  padding: 7px 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.orders-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Table container */
+.orders-table-wrapper {
+  width: 100%;  /* Full width */
+  max-height: 600px;
+  overflow-y: auto; /* Vertical scroll if needed */
+  overflow-x: auto; /* Horizontal scroll always visible */
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  margin: 0 auto;  /* Center the table */
+}
+
+/* Scrollable table wrapper */
+.orders-table-scroll {
+  overflow-x: auto;  /* Horizontal scroll for the table */
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+
+/* Custom scrollbar styling for webkit browsers */
+.orders-table-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.orders-table-scroll::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 4px;
+}
+
+.orders-table-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+
+/* Orders table styling */
+.orders-table {
+  width: 100%; /* Make sure table takes full width of the container */
+  border-collapse: collapse;
+  table-layout: auto; /* Allow the table to adjust its width based on content */
+  min-width: 100%; /* Ensure the table doesn't shrink beyond the container */
+}
+
+/* Sticky header */
+.orders-table thead {
+  background-color: #f1f3f5;
+  position: sticky;
+  top: 0;
+  z-index: 3; /* Ensure header stays above the table body */
+}
+
+/* Adjustments for checkbox alignment */
+.orders-table input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+
+.orders-table th,
+.orders-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* Style for editable cells */
+.orders-table td.editable {
+  cursor: pointer;
+  background-color: #f1f3f5;
+}
+
+.orders-table select {
+  width: 100%;
+  border: none;
+  padding: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.orders-table th[data-key="name"],
+.orders-table td[data-key="name"] {
+  width: 200px;
+}
+
+.orders-table th {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.orders-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.orders-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Sticky columns */
+.orders-table th:nth-child(1),
+.orders-table td:nth-child(1),
+.orders-table th:nth-child(2),
+.orders-table td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  background-color: #f1f3f5;
+  z-index: 2; /* Make sure it stays on top of other cells when scrolling */
+}
+
+#ordersManagementTableBody tr {
+  display: table-row;
+}
+
+#ordersManagementTableBody.empty-state {
+  text-align: center;
+  font-size: 16px;
+  color: #888;
+  padding: 20px 0;
+}
+
+/* Sort arrow styling */
+.orders-sort-arrow::after {
+  content: "⇅";
+  font-size: 11px;
+  margin-left: 6px;
+  color: #888;
+}
+
+/* Checkbox alignment */
+.orders-table input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+/* To ensure the table doesn't exceed header width */
+#ordersManagementSection {
+  width: 100%;
+  max-width: 1200px;  /* Adjust this to your header max width */
+  margin: 0 auto; /* Center the section */
+}
+
+#saveBtn:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  display: block;
+  margin: 0 auto;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Container for the action buttons */
+.orders-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Left-aligned buttons */
+.left-order-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Right-aligned buttons */
+.right-order-actions {
+  display: flex;
+  gap: 12px;
+}

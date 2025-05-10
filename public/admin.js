@@ -1,7 +1,7 @@
 function showAdminControls() {
     // Hide other sections if necessary
     document.getElementById('expenseTrackingSection').style.display = 'none';
-    document.getElementById('manageOrdersSection').style.display = 'none';
+    document.getElementById('ordersManagementSection').style.display = 'none';
     document.getElementById('adminControlsSection').style.display = 'block';
   
     // Fetch and render tables

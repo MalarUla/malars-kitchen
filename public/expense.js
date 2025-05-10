@@ -1,11 +1,12 @@
 let allExpenseData = [];
 let editedExpenseIds = new Set();
 let itemCategoryMap = {}; // to hold item -> category mapping
+let categoryItemMap = {};
 
 function showExpenseTracking() {
     document.getElementById('expenseTrackingSection').style.display = 'block';
     document.getElementById('adminControlsSection').style.display = 'none';
-    document.getElementById('manageOrdersSection').style.display = 'none';
+    document.getElementById('ordersManagementSection').style.display = 'none';
 
     // Fetch orders only once, if not loaded
     if (allExpenseData.length === 0) {
@@ -132,30 +133,6 @@ async function saveExpenses() {
     }
 }
 
-/*function saveExpenses() {
-    const saveButton = document.getElementById('saveButton');
-    saveButton.disabled = true;
-
-    const updates = [];
-
-    editedExpenseIds.forEach(docId => {
-        const row = document.querySelector(`tr[data-id="${docId}"]`);
-        const comments = row.cells[6].innerText.trim();
-
-        updates.push(updateDoc(doc(db, 'Expense', docId), { comments }));
-    });
-
-    Promise.all(updates)
-        .then(() => {
-            editedExpenseIds.clear();
-            loadExpenses(); // refresh table
-        })
-        .catch(error => {
-            console.error("Error saving expenses:", error);
-            saveButton.disabled = false;
-        });
-}*/
-
 
 // Function to make table cell editable
 document.addEventListener('DOMContentLoaded', () => {
@@ -227,11 +204,44 @@ function openAddExpensePopup() {
     modal.classList.add('show');
   }, 10); // small delay to trigger transition
 
-  if (Object.keys(itemCategoryMap).length === 0) {
+  setDefaultPurchaseDate();
+  setDateLimit();
+
+  if (Object.keys(categoryItemMap).length === 0) {
     loadItemCategoryMaster();
   }
 }
 
+function setDefaultPurchaseDate() {
+  const dateInput = document.getElementById("addDate");
+  const today = new Date();
+
+  // Get local date parts
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+  const day = String(today.getDate()).padStart(2, '0');
+  
+  // Format as yyyy-mm-dd
+  const formattedDate = `${year}-${month}-${day}`;
+  dateInput.value = formattedDate;
+}
+
+// Set the max date to today (to prevent future date selection)
+function setDateLimit() {
+  const dateInput = document.getElementById("addDate");
+  const today = new Date();
+
+  // Get local date parts
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+  const day = String(today.getDate()).padStart(2, '0');
+
+  // Format as yyyy-mm-dd
+  const formattedDate = `${year}-${month}-${day}`;
+
+  // Set the max date to today's date
+  dateInput.setAttribute('max', formattedDate);
+}
 
 function closeAddExpensePopup() {
   const modal = document.getElementById("addExpenseModal");
@@ -265,10 +275,18 @@ async function submitNewExpense() {
     const amount = parseFloat(document.getElementById("addAmount").value);
     const store = document.getElementById("addStore").value.trim();
     const comments = document.getElementById("addComments").value.trim();
+    const purchaseDateInput = document.getElementById("addDate").value;
 
     if (!item || !category || isNaN(amount)) {
         alert("Item, Category and valid Amount are required.");
         return;
+    }
+
+    let purchaseDate;
+    if (purchaseDateInput) {
+      purchaseDate = new Date(purchaseDateInput + 'T00:00:00');
+    } else {
+      purchaseDate = new Date();
     }
 
     try {
@@ -278,7 +296,7 @@ async function submitNewExpense() {
             amount,
             store,
             comments,
-            purchaseDate: firebase.firestore.Timestamp.fromDate(new Date())
+            purchaseDate: firebase.firestore.Timestamp.fromDate(purchaseDate)
         });
 
         // Clear the fields for next entry but keep modal open
@@ -287,6 +305,10 @@ async function submitNewExpense() {
         document.getElementById("addAmount").value = '';
         document.getElementById("addStore").value = '';
         document.getElementById("addComments").value = '';
+        
+        // Reset default date
+        setDefaultPurchaseDate();
+        setDateLimit();
 
         // Refresh table
         await fetchAndRenderExpenses();
@@ -392,28 +414,38 @@ async function refreshGoogleSheet() {
     }
 }
 
-
 function loadItemCategoryMaster() {
-  const itemSelect = document.getElementById('addItem');
-  itemSelect.innerHTML = '<option value="">-- Select Item --</option>'; // reset dropdown
+  categoryItemMap = {}; // key: category, value: array of items
+  const categorySelect = document.getElementById('addCategory');
+  categorySelect.innerHTML = '<option value="">-- Select Category --</option>';
 
   db.collection("ItemCategoryMaster")
-      .get()
-      .then(snapshot => {
-          snapshot.forEach(doc => {
-              const data = doc.data();
-              itemCategoryMap[data.item] = data.category;
+    .get()
+    .then(snapshot => {
+      const categoriesSet = new Set();
 
-              const option = document.createElement('option');
-              option.value = data.item;
-              option.textContent = data.item;
-              itemSelect.appendChild(option);
-          });
-      })
-      .catch(error => {
-          console.error("Error loading ItemCategoryMaster:", error);
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (!categoryItemMap[data.category]) {
+          categoryItemMap[data.category] = [];
+        }
+        categoryItemMap[data.category].push(data.item);
+        categoriesSet.add(data.category);
       });
+
+      // Populate category dropdown
+      Array.from(categoriesSet).sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error("Error loading ItemCategoryMaster:", error);
+    });
 }
+
 
 function populateCategory() {
     const itemSelect = document.getElementById('addItem');
@@ -421,4 +453,19 @@ function populateCategory() {
     const selectedItem = itemSelect.value;
 
     categoryInput.value = itemCategoryMap[selectedItem] || '';
+}
+
+function populateItems() {
+  const category = document.getElementById("addCategory").value;
+  const itemSelect = document.getElementById("addItem");
+  itemSelect.innerHTML = '<option value="">-- Select Item --</option>'; // Reset
+
+  if (categoryItemMap[category]) {
+    categoryItemMap[category].forEach(item => {
+      const option = document.createElement("option");
+      option.value = item;
+      option.textContent = item;
+      itemSelect.appendChild(option);
+    });
+  }
 }

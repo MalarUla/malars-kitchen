@@ -3,6 +3,7 @@ let foodPrices = {};
 let allOrdersData = [];
 let sortColumn = null;
 let sortDirection = 1; // 1 for ascending, -1 for descending
+window.menuItems = [];
 
 
 function showLoginForm() {
@@ -104,7 +105,7 @@ function logoutUser() {
   document.getElementById('order-section').style.display = 'block';
   document.getElementById('adminMenu').style.display = 'none';   
 
-  document.getElementById('manageOrdersSection').style.display = 'none';
+  document.getElementById('ordersManagementSection').style.display = 'none';
   document.getElementById('expenseTrackingSection').style.display = 'none';
   document.getElementById('adminControlsSection').style.display = 'none';
 
@@ -118,7 +119,7 @@ function logoutUser() {
 }
 
 function showManageOrders() {
-  document.getElementById("manageOrdersSection").style.display = 'block';
+  document.getElementById("ordersManagementSection").style.display = 'block';
   document.getElementById('expenseTrackingSection').style.display = 'none';
   document.getElementById('adminControlsSection').style.display = 'none';
   // Fetch orders only once, if not loaded
@@ -277,9 +278,16 @@ function toggleAllCheckboxes(masterCheckbox) {
 }
 
 
-function loadFoodItems() {
-  const foodSelect = document.getElementById("foodItem");
-  const menuData = [];
+function loadFoodItems(options = {}) {
+  console.log("📦 loadFoodItems() called with options:", options);
+
+  const {
+    skipRenderMenu = false,
+    targetSelectId = "mainFoodItem"
+  } = options;
+
+  const foodSelect = document.getElementById(targetSelectId);
+  window.menuItems = [];
 
   foodSelect.innerHTML = `<option value="">Select</option>`;
   foodPrices = {}; // Reset prices
@@ -287,6 +295,7 @@ function loadFoodItems() {
   db.collection("FoodItems")
     .get()
     .then((querySnapshot) => {
+      const items = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         console.log("🔹 Food item fetched:", data);
@@ -302,12 +311,16 @@ function loadFoodItems() {
         // Store in foodPrices map
         foodPrices[name] = price;
 
-        // Push to menu list for rendering cards
-        menuData.push({ name, price });
+        items.push({ name, price });
+
       });
 
-      // Now render the menu cards
-      renderMenuCards(menuData);
+      window.menuItems = items;
+
+      // Only render cards if not disabled
+      if (!skipRenderMenu) {
+        renderMenuCards(items);
+      }
     })
     .catch((error) => {
       console.error("❌ Error fetching food items: ", error);
@@ -336,12 +349,28 @@ function renderMenuCards(data) {
   });
 }
 
-function calculatePrice() {
+/*function calculatePrice() {
+  const selectedItem = selectElement.value;
   const item = document.getElementById('foodItem').value;
   const quantity = parseInt(document.getElementById('quantity').value);
   const price = quantity * (foodPrices[item] || 0);
   document.getElementById('price').value = price.toFixed(2);
+}*/
+
+function calculatePrice(selectElement) {
+  const selectedItem = selectElement.value;
+  const priceField = selectElement.closest("form").querySelector("#price");
+
+  if (foodPrices[selectedItem]) {
+    const quantityInput = selectElement.closest("form").querySelector("#quantity");
+    const quantity = parseInt(quantityInput.value, 10) || 1;
+    const total = foodPrices[selectedItem] * quantity;
+    priceField.value = `₹${total}`;
+  } else {
+    priceField.value = "";
+  }
 }
+
 
 function clearForm() {
   document.getElementById('orderForm').reset();
