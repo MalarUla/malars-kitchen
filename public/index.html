@@ -97,30 +97,30 @@
       <div id="order-section">
         <h2>Place Your Order</h2>
         <form id="orderForm">
-          <label for="customerName">Customer Name*</label>
-          <input type="text" id="customerName" required>
+          <label for="mainCustomerName">Customer Name*</label>
+          <input type="text" id="mainCustomerName" required>
   
-          <label for="contactEmail">Contact Email (optional)</label>
-          <input type="email" id="contactEmail">
+          <label for="mainContactEmail">Contact Email (optional)</label>
+          <input type="email" id="mainContactEmail">
   
-          <label for="contactPhone">Contact Phone*</label>
-          <input type="text" id="contactPhone" required>
+          <label for="mainContactPhone">Contact Phone*</label>
+          <input type="text" id="mainContactPhone" required>
   
           <label for="mainFoodItem">Food Item*</label>
           <select id="mainFoodItem" onchange="calculatePrice(this)" required>
             <option value="">Select</option>
           </select>
   
-          <label for="quantity">Quantity*</label>
-          <input type="number" id="quantity" value="1" min="1" onchange="calculatePrice(this.closest('form').querySelector('select'))" required>
+          <label for="mainQuantity">Quantity*</label>
+          <input type="number" id="mainQuantity" value="1" min="1" onchange="calculatePrice(document.getElementById('mainFoodItem'))" required>
   
-          <label for="price">Price</label>
-          <input type="text" id="price" disabled>
+          <label for="mainPrice">Price</label>
+          <input type="text" id="mainPrice" disabled>
   
-          <label for="comments">Comments / Suggestions</label>
-          <textarea id="comments"></textarea>
+          <label for="mainComments">Comments / Suggestions</label>
+          <textarea id="mainComments"></textarea>
   
-          <button type="button" onclick="submitOrder()">Submit</button>
+          <button type="button" onclick="submitOrder('main')">Submit</button>
         </form>
       </div>
     
@@ -333,18 +333,18 @@
         <div class="modal-body">
           <form id="orderForm">
             <div class="form-group">
-              <label for="customerName">Customer Name*</label>
-              <input type="text" id="customerName" required>
+              <label for="modalCustomerName">Customer Name*</label>
+              <input type="text" id="modalCustomerName" required>
             </div>
 
             <div class="form-group">
-              <label for="contactEmail">Contact Email (optional)</label>
-              <input type="email" id="contactEmail">
+              <label for="modalContactEmail">Contact Email (optional)</label>
+              <input type="email" id="modalContactEmail">
             </div>
 
             <div class="form-group">
-              <label for="contactPhone">Contact Phone*</label>
-              <input type="text" id="contactPhone" required>
+              <label for="modalContactPhone">Contact Phone*</label>
+              <input type="text" id="modalContactPhone" required>
             </div>
 
             <div class="form-group">
@@ -355,22 +355,22 @@
             </div>
 
             <div class="form-group">
-              <label for="quantity">Quantity*</label>
-              <input type="number" id="quantity" value="1" min="1" onchange="calculatePrice(this.closest('form').querySelector('select'))" required>
+              <label for="modalQuantity">Quantity*</label>
+              <input type="number" id="modalQuantity" value="1" min="1" onchange="calculatePrice(document.getElementById('modalFoodItem'))" required>
             </div>
 
             <div class="form-group">
-              <label for="price">Price</label>
-              <input type="text" id="price" disabled>
+              <label for="modalPrice">Price</label>
+              <input type="text" id="modalPrice" disabled>
             </div>
 
             <div class="form-group">
-              <label for="comments">Comments / Suggestions</label>
-              <textarea id="comments"></textarea>
+              <label for="modalComments">Comments / Suggestions</label>
+              <textarea id="modalComments"></textarea>
             </div>
 
             <div class="button-group">
-              <button type="button" onclick="submitOrder()" class="submit-btn">Submit</button>
+              <button type="button" onclick="submitOrder('modal')" class="submit-btn">Submit</button>
               <button type="button" onclick="closeAddOrderPopup()" class="cancel-btn">Cancel</button>
             </div>
           </form>

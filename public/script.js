@@ -357,7 +357,7 @@ function renderMenuCards(data) {
   document.getElementById('price').value = price.toFixed(2);
 }*/
 
-function calculatePrice(selectElement) {
+/*function calculatePrice(selectElement) {
   const selectedItem = selectElement.value;
   const priceField = selectElement.closest("form").querySelector("#price");
 
@@ -369,12 +369,40 @@ function calculatePrice(selectElement) {
   } else {
     priceField.value = "";
   }
+}*/
+
+function calculatePrice(selectElement) {
+  const elementId = selectElement.id; // e.g., "mainFoodItem" or "modalFoodItem"
+  const prefix = elementId.startsWith('modal') ? 'modal' : 'main';
+
+  const selectedItem = selectElement.value;
+  const quantityInput = document.getElementById(`${prefix}Quantity`);
+  const priceField = document.getElementById(`${prefix}Price`);
+
+  if (foodPrices[selectedItem]) {
+    const quantity = parseInt(quantityInput.value, 10) || 1;
+    const total = foodPrices[selectedItem] * quantity;
+    priceField.value = `₹${total}`;
+  } else {
+    priceField.value = '';
+  }
 }
 
 
-function clearForm() {
+
+/*function clearForm() {
   document.getElementById('orderForm').reset();
   document.getElementById('price').value = '';
+}*/
+
+function clearForm(prefix) {
+  document.getElementById(`${prefix}CustomerName`).value = '';
+  document.getElementById(`${prefix}ContactPhone`).value = '';
+  document.getElementById(`${prefix}FoodItem`).value = '';
+  document.getElementById(`${prefix}Quantity`).value = '1';
+  document.getElementById(`${prefix}ContactEmail`).value = '';
+  document.getElementById(`${prefix}Comments`).value = '';
+  document.getElementById(`${prefix}Price`).value = '';
 }
 
 function showToast(message, type = 'success') {
@@ -388,7 +416,66 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-async function submitOrder() {
+async function submitOrder(context) {
+  const prefix = context === 'modal' ? 'modal' : 'main';
+
+  const name = document.getElementById(`${prefix}CustomerName`).value.trim();
+  const phone = document.getElementById(`${prefix}ContactPhone`).value.trim();
+  const item = document.getElementById(`${prefix}FoodItem`).value;
+  const quantity = parseInt(document.getElementById(`${prefix}Quantity`).value);
+  const email = document.getElementById(`${prefix}ContactEmail`).value.trim();
+  const comments = document.getElementById(`${prefix}Comments`).value;
+
+  if (!name || !phone || !item || !quantity) {
+    showToast('Please fill all required fields.', 'error');
+    return;
+  }
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+    showToast('Contact phone must be a 10-digit number.', 'error');
+    return;
+  }
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address.', 'error');
+    return;
+  }
+
+  const price = quantity * (foodPrices[item] || 0);
+
+  try {
+    await db.collection('Orders').add({
+      name,
+      phone,
+      email,
+      item,
+      quantity,
+      price,
+      comments,
+      orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+      orderStatus: 'Ordered',
+      paymentStatus: 'Pending',
+      paymentReceivedDate: null,
+      paymentMethod: '',
+      paymentReference: '',
+      updatedDate: firebase.firestore.FieldValue.serverTimestamp(),
+      additionalDetails: ''
+    });
+
+    showToast('Order submitted successfully!', 'success');
+    clearForm(prefix);
+
+    if (prefix === 'modal') {
+      closeAddOrderPopup();
+    }
+    
+  } catch (error) {
+    showToast('Failed to submit order. Please try again later.', 'error');
+  }
+}
+
+
+/*async function submitOrder() {
   const name = document.getElementById('customerName').value.trim();
   const phone = document.getElementById('contactPhone').value.trim();
   const item = document.getElementById('foodItem').value;
@@ -438,7 +525,7 @@ async function submitOrder() {
   } catch (error) {
     showToast('Failed to submit order. Please try again later.', 'error');
   }
-}
+}*/
 
 window.addEventListener('load', () => {
   console.log("Page loaded. Checking for logged-in user...");

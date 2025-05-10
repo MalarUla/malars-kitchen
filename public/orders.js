@@ -474,7 +474,7 @@ function exportOrdersToCSV() {
   
     // Reset form fields if needed
     document.getElementById("orderForm").reset();
-    document.getElementById("price").value = "";
+    document.getElementById("modalPrice").value = "";
     
     window.menuItems = [];
 
@@ -510,13 +510,13 @@ function exportOrdersToCSV() {
       document.body.classList.remove("modal-open");
         
       // Clear form fields AFTER closing
-      document.getElementById("customerName").value = '';
-      document.getElementById("contactEmail").value = '';
-      document.getElementById("contactPhone").value = '';
-      document.getElementById("foodItem").value = '';
-      document.getElementById("quantity").value = '1';
-      document.getElementById("price").value = '';
-      document.getElementById("comments").value = '';
+      document.getElementById("modalCustomerName").value = '';
+      document.getElementById("modalContactEmail").value = '';
+      document.getElementById("modalContactPhone").value = '';
+      document.getElementById("modalFoodItem").value = '';
+      document.getElementById("modalQuantity").value = '1';
+      document.getElementById("modalPrice").value = '';
+      document.getElementById("modalComments").value = '';
   
       // Optionally refresh orders table
       fetchAndRenderOrders();
