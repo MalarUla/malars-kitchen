@@ -15,6 +15,8 @@
 
   <link rel="stylesheet" href="orders.css">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <link rel="stylesheet" href="stats.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
     // Your web app's Firebase configuration
@@ -50,6 +52,9 @@
   <script src="admin.js"></script>
   <!-- Orders Management UI and logic -->
   <script src="orders.js"></script>
+  <!-- Stats and Charts -->
+  <script src="stats.js"></script>
+
 
 </head>
 <body>
@@ -128,11 +133,54 @@
 
     <section id="adminMenu" style="display: none;">
       <h2>Admin Menu</h2>
-      <!--button onclick="showManageOrders()">Manage Orders</button-->
       <button onclick="manageOrders()">Order Management</button>
       <button onclick="showExpenseTracking()">Expense Tracking</button>
       <button onclick="showAdminControls()">Admin Controls</button>
+      <button onclick="initStats()">Stats and Charts</button>
     </section>
+
+    <div id="statsSection" style="display: none; margin-top: 20px;">
+      <h3>Stats and Charts</h3>
+        <!-- Year Selector -->
+      <div class="stats-controls">
+        <label for="statsYear">Select Year:</label>
+        <input type="number" id="statsYear" min="2020" max="2030" step="1" value="2025">
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('financial')">Financial Metrics</button>
+        <button class="tab-button" onclick="switchTab('operational')">Operational Performance</button>
+      </div>
+    
+      <div id="financialTab" class="tab-content active">
+        <div class="chart-container">
+          <h4>Monthly Revenue vs Expense</h4>
+          <canvas id="revenueVsExpenseChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4>Monthly Profit or Loss</h4>
+          <canvas id="profitLossChart"></canvas>
+        </div>
+      </div>
+    
+      <div id="operationalTab" class="tab-content">
+        <div class="chart-container">
+          <h4>Order Volume by Status</h4>
+          <canvas id="orderVolumeStatusChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4>Expenses by Category</h4>
+          <canvas id="expensesByCategoryChart"></canvas>
+        </div>
+      </div>
+    
+      <div id="drilldownTableContainer" style="display: none; margin-top: 30px;">
+        <h4>Drilldown Details</h4>
+        <div id="drilldownTable"></div>
+      </div>
+      
+    </div>
+    
 
     <div id="adminControlsSection" style="display: none; margin-top: 20px;">
       <h3>Admin Controls</h3>
@@ -280,42 +328,49 @@
       <h3>Orders Management</h3>
     
       <!-- Search Controls -->
-      <div class="orders-search-controls">
-        <div>
+      <div class="orders-search-controls" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+        <div style="display: flex; flex-direction: column;">
           <label for="filterStatusTop">Order Status</label>
-          <select id="filterStatusTop" class="orders-select">
+          <select id="filterStatusTop" class="orders-select" multiple size="6">
             <option value="">-- All --</option>
             <option value="Ordered">Ordered</option>
             <option value="In Prep">In Prep</option>
             <option value="Ready">Ready</option>
             <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
           </select>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column;">
           <label for="filterPaymentStatusTop">Payment Status</label>
-          <select id="filterPaymentStatusTop" class="orders-select">
+          <select id="filterPaymentStatusTop" class="orders-select" multiple size="4">
             <option value="">-- All --</option>
             <option value="Pending">Pending</option>
             <option value="Fully Received">Fully Received</option>
             <option value="Partially Received">Partially Received</option>
           </select>
         </div>
-        <div>
-          <label>Order Date</label>
+        <div style="display: flex; flex-direction: column;">
+          <label for="filterDateFromTop">Order Date From</label>
           <input type="date" id="filterDateFromTop" class="orders-input" />
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <label for="filterDateToTop">Order Date To</label>
           <input type="date" id="filterDateToTop" class="orders-input" />
         </div>
-        <div style="align-self: flex-end;">
-          <button id="ordersSearchBtn" class="orders-btn">Search</button>
-          <button id="ordersResetBtn" class="orders-btn">Reset</button>
+        <div style="display: flex; flex-direction: column;">
+          <label style="visibility: hidden;">Actions</label>
+          <div style="display: flex; gap: 10px;">
+            <button id="ordersSearchBtn" class="orders-btn">Search</button>
+            <button id="ordersResetBtn" class="orders-btn">Reset</button>
+          </div>
         </div>
       </div>
-      <!--button id="saveBtn" class="orders-btn" onclick="saveDataToBackend()">Save Changes</button-->
-
+      
       <div class="orders-actions-row">
         <div class="left-order-actions">
           <button id="saveBtn" class="orders-btn" onclick="saveDataToBackend()">Save Changes</button>
           <button id="newOrderBtn" class="orders-btn" onclick="openAddOrderPopup()">New Order</button>
+          <button id="updateOrderBtn" class="orders-btn" onclick="openUpdateOrderPopup()">Update Order</button>
         </div>
         <div class="right-order-actions">
           <button id="exportCSVBtn" class="orders-btn" onclick="exportOrdersToCSV()">Export to CSV</button>
@@ -379,6 +434,67 @@
 
       <!-- Optional overlay -->
       <div id="orderModalOverlay" class="modal-overlay"></div>
+
+      <!-- Update Order Modal -->
+      <div id="updateOrderModal" class="modal">
+        <div class="modal-header">
+          <h2>Update Order</h2>
+          <img src="images/Logo.png" alt="Company Logo" class="company-logo">
+        </div>
+
+        <div class="modal-body">
+          <form id="updateOrderForm">
+            <input type="hidden" id="updateOrderRowIndex" />
+
+            <div class="form-group">
+              <label for="updateCustomerName">Customer Name*</label>
+              <input type="text" id="updateCustomerName" required>
+            </div>
+
+            <div class="form-group">
+              <label for="updateContactEmail">Contact Email</label>
+              <input type="email" id="updateContactEmail">
+            </div>
+
+            <div class="form-group">
+              <label for="updateContactPhone">Contact Phone*</label>
+              <input type="text" id="updateContactPhone" required>
+            </div>
+
+            <div class="form-group">
+              <label for="updateFoodItem">Food Item*</label>
+              <select id="updateFoodItem" onchange="calculatePrice(this)" required>
+                <option value="">Select</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="updateQuantity">Quantity*</label>
+              <input type="number" id="updateQuantity" value="1" min="1" onchange="calculatePrice(document.getElementById('updateFoodItem'))" required>
+            </div>
+
+            <div class="form-group">
+              <label for="updatePrice">Price</label>
+              <input type="text" id="updatePrice" disabled>
+            </div>
+
+            <div class="form-group">
+              <label for="updateOrderDate">Order Date</label>
+              <input type="date" id="updateOrderDate">
+            </div>
+
+            <div class="form-group">
+              <label for="updateComments">Suggestions / Instructions</label>
+              <textarea id="updateComments"></textarea>
+            </div>
+
+            <div class="button-group">
+              <button type="button" onclick="submitUpdatedOrder()" class="submit-btn">Update</button>
+              <button type="button" onclick="closeModal('updateOrderModal')" class="cancel-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       
       <!-- Table Wrapper -->

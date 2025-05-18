@@ -222,3 +222,11 @@
   display: flex;
   gap: 12px;
 }
+
+.edited-row {
+  background-color: #fff7d6;
+}
+
+table {
+  -webkit-overflow-scrolling: touch;
+}

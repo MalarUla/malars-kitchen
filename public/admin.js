@@ -3,6 +3,7 @@ function showAdminControls() {
     document.getElementById('expenseTrackingSection').style.display = 'none';
     document.getElementById('ordersManagementSection').style.display = 'none';
     document.getElementById('adminControlsSection').style.display = 'block';
+    document.getElementById('statsSection').style.display = 'none'
   
     // Fetch and render tables
     fetchFoodItems();

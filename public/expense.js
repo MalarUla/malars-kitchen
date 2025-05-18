@@ -7,6 +7,7 @@ function showExpenseTracking() {
     document.getElementById('expenseTrackingSection').style.display = 'block';
     document.getElementById('adminControlsSection').style.display = 'none';
     document.getElementById('ordersManagementSection').style.display = 'none';
+    document.getElementById('statsSection').style.display = 'none'
 
     // Fetch orders only once, if not loaded
     if (allExpenseData.length === 0) {
@@ -35,30 +36,6 @@ async function fetchAndRenderExpenses() {
 }
 
 function renderFilteredExpenses() {
-  
-    /*const name = document.getElementById("filterCustomer").value.toLowerCase();
-    const phone = document.getElementById("filterPhone").value.toLowerCase();
-    const item = document.getElementById("filterItem").value.toLowerCase();
-    const dateFrom = document.getElementById("filterDateFrom").value;
-    const dateTo = document.getElementById("filterDateTo").value;
-    const selectedStatuses = Array.from(document.getElementById("filterStatus").selectedOptions).map(o => o.value);
-    const selectedPaymentStatuses = Array.from(document.getElementById("filterPaymentStatus").selectedOptions).map(o => o.value);
-    
-    const filtered = allOrdersData.filter(order => {
-      const orderDate = order.orderDate?.toDate ? order.orderDate.toDate() : null;
-  
-      return (
-        (!name || order.name.toLowerCase().includes(name)) &&
-        (!phone || order.phone.toLowerCase().includes(phone)) &&
-        (!item || order.item.toLowerCase().includes(item)) &&
-        (selectedStatuses.length === 0 || selectedStatuses.includes(order.orderStatus)) &&
-        (!dateFrom || (orderDate && new Date(orderDate) >= new Date(dateFrom))) &&
-        (!dateTo || (orderDate && new Date(orderDate) <= new Date(dateTo))) &&
-        (selectedPaymentStatuses.length === 0 || selectedPaymentStatuses.includes(order.paymentStatus))
-      );
-    });
-  
-    renderOrdersTable(filtered);*/
     renderExpenseTable(allExpenseData)
 }
 

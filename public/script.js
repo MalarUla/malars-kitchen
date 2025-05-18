@@ -349,31 +349,15 @@ function renderMenuCards(data) {
   });
 }
 
-/*function calculatePrice() {
-  const selectedItem = selectElement.value;
-  const item = document.getElementById('foodItem').value;
-  const quantity = parseInt(document.getElementById('quantity').value);
-  const price = quantity * (foodPrices[item] || 0);
-  document.getElementById('price').value = price.toFixed(2);
-}*/
-
-/*function calculatePrice(selectElement) {
-  const selectedItem = selectElement.value;
-  const priceField = selectElement.closest("form").querySelector("#price");
-
-  if (foodPrices[selectedItem]) {
-    const quantityInput = selectElement.closest("form").querySelector("#quantity");
-    const quantity = parseInt(quantityInput.value, 10) || 1;
-    const total = foodPrices[selectedItem] * quantity;
-    priceField.value = `₹${total}`;
-  } else {
-    priceField.value = "";
-  }
-}*/
-
 function calculatePrice(selectElement) {
   const elementId = selectElement.id; // e.g., "mainFoodItem" or "modalFoodItem"
-  const prefix = elementId.startsWith('modal') ? 'modal' : 'main';
+
+  let prefix = 'main';
+  if (elementId.startsWith('modal')) {
+    prefix = 'modal';
+  } else if (elementId.startsWith('update')) {
+    prefix = 'update';
+  }
 
   const selectedItem = selectElement.value;
   const quantityInput = document.getElementById(`${prefix}Quantity`);
@@ -387,13 +371,6 @@ function calculatePrice(selectElement) {
     priceField.value = '';
   }
 }
-
-
-
-/*function clearForm() {
-  document.getElementById('orderForm').reset();
-  document.getElementById('price').value = '';
-}*/
 
 function clearForm(prefix) {
   document.getElementById(`${prefix}CustomerName`).value = '';
@@ -417,7 +394,13 @@ function showToast(message, type = 'success') {
 }
 
 async function submitOrder(context) {
-  const prefix = context === 'modal' ? 'modal' : 'main';
+  
+  let prefix = 'main';
+  if (context === 'modal') {
+    prefix = 'modal';
+  } else if (context === 'update') {
+    prefix = 'update';
+  }
 
   const name = document.getElementById(`${prefix}CustomerName`).value.trim();
   const phone = document.getElementById(`${prefix}ContactPhone`).value.trim();
@@ -475,58 +458,6 @@ async function submitOrder(context) {
 }
 
 
-/*async function submitOrder() {
-  const name = document.getElementById('customerName').value.trim();
-  const phone = document.getElementById('contactPhone').value.trim();
-  const item = document.getElementById('foodItem').value;
-  const quantity = parseInt(document.getElementById('quantity').value);
-  const email = document.getElementById('contactEmail').value.trim();
-  const comments = document.getElementById('comments').value;
-
-  // Validate inputs
-  if (!name || !phone || !item || !quantity) {
-    showToast('Please fill all required fields.', 'error');
-    return;
-  }
-
-  if (!/^[0-9]{10}$/.test(phone)) {
-    showToast('Contact phone must be a 10-digit number.', 'error');
-    return;
-  }
-
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showToast('Please enter a valid email address.', 'error');
-    return;
-  }
-
-  const price = quantity * (foodPrices[item] || 0);
-
-  try {
-    await db.collection('Orders').add({
-      name,
-      phone,
-      email,
-      item,
-      quantity,
-      price,
-      comments,
-      orderDate: firebase.firestore.FieldValue.serverTimestamp(),
-      orderStatus: 'Ordered',
-      paymentStatus: 'Pending',
-      paymentReceivedDate: null,
-      paymentMethod: '',
-      paymentReference: '',
-      updatedDate: firebase.firestore.FieldValue.serverTimestamp(),
-      additionalDetails: ''
-    });
-
-    showToast('Order submitted successfully!', 'success');
-    clearForm();
-  } catch (error) {
-    showToast('Failed to submit order. Please try again later.', 'error');
-  }
-}*/
-
 window.addEventListener('load', () => {
   console.log("Page loaded. Checking for logged-in user...");
   
@@ -549,11 +480,6 @@ window.addEventListener('load', () => {
     document.querySelector('.menu-section').style.display = 'none';
     document.getElementById('adminMenu').style.display = 'block';
   }
-
-  // Setup theme toggle
-  /*document.getElementById('toggleTheme').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-  });*/
 
   // Filter menu items
   document.getElementById('menuFilter').addEventListener('input', function () {
