@@ -1,4 +1,6 @@
 let monthlyComparisonChartInstance = null;
+const dynamicChartColumns = ["orderDate", "item", "name", "quantity", "price", "orderStatus", "paymentStatus", "paymentReceivedDate", "paymentMethod"];
+let dynamicChartInstance = null;
 
 function initStats() {
     document.getElementById('ordersManagementSection').style.display = 'none'
@@ -492,3 +494,176 @@ function randomColor() {
   return `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
 }
   
+function updateAxisOptions() {
+  const chartType = document.getElementById("chartType").value;
+  const xSelect = document.getElementById("xAxisColumn");
+  const ySelect = document.getElementById("yAxisColumn");
+
+  xSelect.innerHTML = dynamicChartColumns.map(col => `<option value="${col}">${col}</option>`).join('');
+  ySelect.innerHTML = dynamicChartColumns.map(col => `<option value="${col}">${col}</option>`).join('');
+
+  // Pie & Doughnut require only 1 y-axis
+  if (chartType === 'pie' || chartType === 'doughnut') {
+    ySelect.style.display = "none";
+    ySelect.previousElementSibling.style.display = "none";
+  } else {
+    ySelect.style.display = "";
+    ySelect.previousElementSibling.style.display = "";
+  }
+}
+
+async function generateDynamicChart() {
+  const chartType = document.getElementById("chartType").value;
+  const xCol = document.getElementById("xAxisColumn").value;
+  const yCol = document.getElementById("yAxisColumn").value;
+  const dateFrom = new Date(document.getElementById("dateFrom").value);
+  const dateTo = new Date(document.getElementById("dateTo").value);
+
+  const snapshot = await db.collection("Orders").get();
+  const rawData = [];
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    const orderDate = d.orderDate?.toDate?.();
+    if (!orderDate || isNaN(orderDate)) return;
+
+    if ((!isNaN(dateFrom) && orderDate < dateFrom) || (!isNaN(dateTo) && orderDate > dateTo)) return;
+
+    rawData.push({ ...d, orderDate });
+  });
+
+  const ctx = document.getElementById("dynamicChartCanvas").getContext("2d");
+  if (dynamicChartInstance) dynamicChartInstance.destroy();
+
+  let config;
+
+  // Group & format data
+  if (["pie", "doughnut", "polarArea", "radar"].includes(chartType)) {
+    const grouped = {};
+    rawData.forEach(item => {
+      const label = item[xCol] || "Unknown";
+      const value = parseFloat(item[yCol]) || 1;
+      grouped[label] = (grouped[label] || 0) + value;
+    });
+
+    config = {
+      type: chartType,
+      data: {
+        labels: Object.keys(grouped),
+        datasets: [{
+          label: `${yCol} by ${xCol}`,
+          data: Object.values(grouped),
+          backgroundColor: generateColors(Object.keys(grouped).length)
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: `${chartType} chart` },
+          legend: { display: true }
+        }
+      }
+    };
+  }
+
+  else if (chartType === "scatter") {
+    const points = rawData.map(item => ({
+      x: parseFloat(item[xCol]) || 0,
+      y: parseFloat(item[yCol]) || 0
+    }));
+
+    config = {
+      type: "scatter",
+      data: {
+        datasets: [{
+          label: `${yCol} vs ${xCol}`,
+          data: points,
+          backgroundColor: "rgba(255, 99, 132, 0.7)"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: "Scatter Chart" }
+        },
+        scales: {
+          x: { title: { display: true, text: xCol } },
+          y: { title: { display: true, text: yCol } }
+        }
+      }
+    };
+  }
+
+  else if (chartType === "bubble") {
+    const points = rawData.map(item => ({
+      x: parseFloat(item[xCol]) || 0,
+      y: parseFloat(item[yCol]) || 0,
+      r: Math.random() * 10 + 3 // optional: replace with a 3rd column if needed
+    }));
+
+    config = {
+      type: "bubble",
+      data: {
+        datasets: [{
+          label: `${yCol} vs ${xCol}`,
+          data: points,
+          backgroundColor: "rgba(75, 192, 192, 0.6)"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: "Bubble Chart" }
+        },
+        scales: {
+          x: { title: { display: true, text: xCol } },
+          y: { title: { display: true, text: yCol } }
+        }
+      }
+    };
+  }
+
+  else {
+    // Default: bar, line
+    const grouped = {};
+    rawData.forEach(item => {
+      const label = item[xCol] || "Unknown";
+      const value = parseFloat(item[yCol]) || 0;
+      grouped[label] = (grouped[label] || 0) + value;
+    });
+
+    config = {
+      type: chartType,
+      data: {
+        labels: Object.keys(grouped),
+        datasets: [{
+          label: `${yCol} by ${xCol}`,
+          data: Object.values(grouped),
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgba(0, 123, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          title: { display: true, text: `${chartType} chart` }
+        },
+        scales: (chartType === 'bar' || chartType === 'line') ? {
+          y: { beginAtZero: true }
+        } : {}
+      }
+    };
+  }
+
+  dynamicChartInstance = new Chart(ctx, config);
+}
+
+function generateColors(count) {
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    const hue = (i * 360 / count) % 360;
+    colors.push(`hsl(${hue}, 70%, 60%)`);
+  }
+  return colors;
+}

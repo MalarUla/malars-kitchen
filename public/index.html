@@ -150,6 +150,7 @@
       <div class="tabs">
         <button class="tab-button active" onclick="switchTab('financial')">Financial Metrics</button>
         <button class="tab-button" onclick="switchTab('operational')">Operational Performance</button>
+        <button class="tab-button" onclick="switchTab('dynamic')">Dynamic Reports</button>
       </div>
     
       <div id="financialTab" class="tab-content active">
@@ -177,6 +178,40 @@
       <div id="drilldownTableContainer" style="display: none; margin-top: 30px;">
         <h4>Drilldown Details</h4>
         <div id="drilldownTable"></div>
+      </div>
+
+      <div id="dynamicTab" class="tab-content">
+        <div class="chart-controls">
+          <label for="chartType">Chart Type:</label>
+          <select id="chartType" onchange="updateAxisOptions()">
+            <option value="bar">Bar</option>
+            <option value="line">Line</option>
+            <option value="pie">Pie</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="polarArea">Polar Area</option>
+            <option value="radar">Radar</option>
+            <option value="scatter">Scatter</option>
+            <option value="bubble">Bubble</option>
+          </select>
+      
+          <label for="xAxisColumn">X-Axis:</label>
+          <select id="xAxisColumn"></select>
+      
+          <label for="yAxisColumn">Y-Axis:</label>
+          <select id="yAxisColumn"></select>
+      
+          <label>Date From:</label>
+          <input type="date" id="dateFrom">
+      
+          <label>Date To:</label>
+          <input type="date" id="dateTo">
+      
+          <button onclick="generateDynamicChart()">Generate Chart</button>
+        </div>
+      
+        <div class="chart-container">
+          <canvas id="dynamicChartCanvas"></canvas>
+        </div>
       </div>
       
     </div>
