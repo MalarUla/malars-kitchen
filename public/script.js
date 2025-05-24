@@ -349,6 +349,29 @@ function renderMenuCards(data) {
   });
 }
 
+/*function calculatePrice(selectElement) {
+  const elementId = selectElement.id; // e.g., "mainFoodItem" or "modalFoodItem"
+
+  let prefix = 'main';
+  if (elementId.startsWith('modal')) {
+    prefix = 'modal';
+  } else if (elementId.startsWith('update')) {
+    prefix = 'update';
+  }
+
+  const selectedItem = selectElement.value;
+  const quantityInput = document.getElementById(${prefix}Quantity);
+  const priceField = document.getElementById(${prefix}Price);
+
+  if (foodPrices[selectedItem]) {
+    const quantity = parseInt(quantityInput.value, 10) || 1;
+    const total = foodPrices[selectedItem] * quantity;
+    priceField.value = ₹${total};
+  } else {
+    priceField.value = '';
+  }
+}*/
+
 function calculatePrice(selectElement) {
   const elementId = selectElement.id; // e.g., "mainFoodItem" or "modalFoodItem"
 
@@ -363,13 +386,28 @@ function calculatePrice(selectElement) {
   const quantityInput = document.getElementById(`${prefix}Quantity`);
   const priceField = document.getElementById(`${prefix}Price`);
 
-  if (foodPrices[selectedItem]) {
-    const quantity = parseInt(quantityInput.value, 10) || 1;
-    const total = foodPrices[selectedItem] * quantity;
-    priceField.value = `₹${total}`;
-  } else {
+  const discountCheckbox = document.getElementById(`${prefix}DiscountCheckbox`);
+  const discountPriceInput = document.getElementById(`${prefix}DiscountPriceInput`);
+
+  const quantity = parseInt(quantityInput.value, 10) || 1;
+
+  if (!selectedItem || !foodPrices[selectedItem]) {
     priceField.value = '';
+    return;
   }
+
+  let unitPrice = foodPrices[selectedItem];
+
+  if (discountCheckbox?.checked) {
+    const userDiscount = parseFloat(discountPriceInput.value);
+    if (!isNaN(userDiscount)) {
+      unitPrice = userDiscount;
+    }
+  }
+
+  const total = unitPrice * quantity;
+  priceField.value = `₹${total.toFixed(2)}`;
+
 }
 
 function clearForm(prefix) {
@@ -408,6 +446,20 @@ async function submitOrder(context) {
   const quantity = parseInt(document.getElementById(`${prefix}Quantity`).value);
   const email = document.getElementById(`${prefix}ContactEmail`).value.trim();
   const comments = document.getElementById(`${prefix}Comments`).value;
+  const priceStr = document.getElementById(`${prefix}Price`).value;
+  const price = parseFloat(priceStr.replace(/[^\d.]/g, ''));
+
+  let discountPrice = 0.0;
+  let discount = 'N';
+  const discPriceElement = document.getElementById(`${prefix}DiscountPriceInput`);
+  if (discPriceElement) {
+    const rawValue = discPriceElement.value.trim();
+    discountPrice = rawValue ? parseFloat(rawValue.replace(/[^\d.]/g, '')) || 0.0 : 0.0;
+
+    // Set discountApplied attribute based on discountPrice
+    discount = discountPrice > 0 ? 'Y' : 'N';
+  }
+
 
   if (!name || !phone || !item || !quantity) {
     showToast('Please fill all required fields.', 'error');
@@ -424,7 +476,7 @@ async function submitOrder(context) {
     return;
   }
 
-  const price = quantity * (foodPrices[item] || 0);
+  //const price = quantity * (foodPrices[item] || 0);
 
   try {
     await db.collection('Orders').add({
@@ -434,6 +486,8 @@ async function submitOrder(context) {
       item,
       quantity,
       price,
+      discountPrice,
+      discount,
       comments,
       orderDate: firebase.firestore.FieldValue.serverTimestamp(),
       orderStatus: 'Ordered',

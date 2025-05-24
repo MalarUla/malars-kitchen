@@ -83,6 +83,8 @@ function renderOrdersToTable(orders) {
         <td class="payment-reference" contenteditable="true" data-key="paymentReference">${order.paymentReference || ''}</td>
         <td data-key="comments">${order.comments || ''}</td>
         <td class="additional-details" contenteditable="true" data-key="additionalDetails">${order.additionalDetails || ''}</td>
+        <td data-key="discount">${order.discount || ''}</td>
+        <td data-key="discountPrice">${order.discountPrice || ''}</td>
      `;
       tableBody.appendChild(row);
     });
@@ -91,6 +93,8 @@ function renderOrdersToTable(orders) {
 
     // 🔥 Enable editing behavior and tracking after rows are rendered
     enableInCellEditing();
+
+    calculateOrderIncomeSummaries(orders);
 
     console.log("exit renderOrdersToTable....")
 }
@@ -243,10 +247,15 @@ function makeTableEditable() {
         const selectElements = row.querySelectorAll('select');
         selectElements.forEach(select => {
             select.addEventListener('change', () => {
-                if (select.classList.contains('payment-method') && select.value === 'Cash') {
-                    const referenceCell = row.querySelector('[data-key="paymentReference"]');
-                    if (referenceCell) referenceCell.textContent = 'NA';
+                const referenceCell = row.querySelector('[data-key="paymentReference"]');
+                if (select.classList.contains('payment-method')) {
+                    if (select.value === 'Cash') {
+                        if (referenceCell) referenceCell.textContent = 'NA';
+                    } else {
+                        if (referenceCell) referenceCell.textContent = '';
+                    }
                 }
+                
                 if (select.classList.contains('payment-status')) {
                     const val = select.value;
                     const payDateCell = row.querySelector('[data-key="paymentReceivedDate"]');
@@ -471,26 +480,22 @@ function saveDataToBackend() {
 
             const paymentDateRaw = getValue("payment-received-date", row);
 
-            console.log("Reference:", getValue("payment-reference", row));
-            console.log("Details:", getValue("additional-details", row));
-
             const updatedData = {
                 orderStatus: getValue("order-status", row),
                 paymentStatus: getValue("payment-status", row),
                 paymentReceivedDate: paymentDateRaw ? firebase.firestore.Timestamp.fromDate(new Date(paymentDateRaw)) : null,
+                paymentMethod: getValue("payment-method", row),
                 paymentReference: getValue("payment-reference", row),
                 additionalDetails: getValue("additional-details", row)
             };
 
             // Check if orderStatus exists before proceeding
             if (!updatedData.orderStatus) {
-                console.error(`Missing orderStatus for ${docId}`);
                 hasError = true;
                 continue; // Skip this entry if missing orderStatus
             }
 
             const docRef = db.collection("Orders").doc(docId);
-            console.log("Updating:", docId, updatedData);
             batch.update(docRef, updatedData);
         }
 
@@ -645,6 +650,16 @@ function openAddOrderPopup() {
     // Reset form fields if needed
     document.getElementById("orderForm").reset();
     document.getElementById("modalPrice").value = "";
+
+    // Reset discount checkbox and input
+    const discountCheckbox = document.getElementById("modalDiscountCheckbox");
+    const discountInput = document.getElementById("modalDiscountPriceInput");
+
+    if (discountCheckbox) discountCheckbox.checked = false;
+    if (discountInput) {
+        discountInput.style.display = "none";
+        discountInput.value = "";
+    }
     
     window.menuItems = [];
 
@@ -775,7 +790,6 @@ function openUpdateOrderPopup() {
     document.getElementById("updateContactEmail").value = row.querySelector('[data-key="email"]').textContent.trim();
     document.getElementById("updateQuantity").value = row.querySelector('[data-key="quantity"]').textContent.trim();
     document.getElementById("updatePrice").value = row.querySelector('[data-key="price"]').textContent.trim();
-    //document.getElementById("updateOrderDate").value = formatDateForInput(row.querySelector('[data-key="orderDate"]').textContent.trim());
     const rawDate = row.querySelector('[data-key="orderDate"]').textContent.trim();
     document.getElementById("updateOrderDate").value = formatDateForInput(rawDate);
 
@@ -793,6 +807,26 @@ function openUpdateOrderPopup() {
         });
     } else {
         populateFoodItems("updateFoodItem", window.menuItems, selectedItem);
+    }
+
+    // 🔽 New logic for discount prefill
+    const discountCell = row.querySelector('[data-key="discount"]');
+    const discountPriceCell = row.querySelector('[data-key="discountPrice"]');
+    
+    const discountValue = discountCell ? discountCell.textContent.trim() : "N";
+    const discountPriceValue = discountPriceCell ? discountPriceCell.textContent.trim() : "";
+
+    const discountCheckbox = document.getElementById("updateDiscountCheckbox");
+    const discountInput = document.getElementById("updateDiscountPriceInput");
+
+    if (discountValue === "Y") {
+        discountCheckbox.checked = true;
+        discountInput.style.display = "inline-block";
+        discountInput.value = discountPriceValue || "";
+    } else {
+        discountCheckbox.checked = false;
+        discountInput.style.display = "none";
+        discountInput.value = "";
     }
 }
 
@@ -848,6 +882,9 @@ function submitUpdatedOrder() {
         console.log("Corrected order date:", orderDateObj);
     }
 
+    const isDiscountChecked = document.getElementById("updateDiscountCheckbox").checked;
+    const discountPrice = isDiscountChecked? parseFloat(document.getElementById("updateDiscountPriceInput").value || "0"): 0.0;
+
     const updatedData = {
         name: document.getElementById("updateCustomerName").value,
         phone: document.getElementById("updateContactPhone").value,
@@ -858,6 +895,8 @@ function submitUpdatedOrder() {
         orderDate: firebase.firestore.Timestamp.fromDate(orderDateObj),
         updatedDate: firebase.firestore.FieldValue.serverTimestamp(),
         comments: document.getElementById("updateComments").value,
+        discount: isDiscountChecked ? "Y" : "N",
+        discountPrice: discountPrice
     };
 
     const db = firebase.firestore();
@@ -897,3 +936,53 @@ function updateUpdateOrderButtonState() {
         updateButton.disabled = true;
     }
 }
+
+function toggleDiscount(checkbox) {
+    const prefix = checkbox.id.startsWith("modal") ? "modal" : "update";
+    const discountInput = document.getElementById(`${prefix}DiscountPriceInput`);
+    const foodSelect = document.getElementById(`${prefix}FoodItem`);
+  
+    if (checkbox.checked) {
+      // Show field
+      discountInput.style.display = "inline-block";
+  
+      // Autofill discount price from menu
+      const foodId = foodSelect.value;
+      //const foodItem = foodMenu.find(item => item.id === foodId);
+      const foodItem = window.menuItems.find(item => item.id === foodId);
+      if (foodItem && foodItem.discountPrice) {
+        discountInput.value = foodItem.discountPrice;
+      }
+    } else {
+      // Hide field and reset
+      discountInput.style.display = "none";
+      discountInput.value = '';
+    }
+  
+    // Recalculate price
+    calculatePrice(foodSelect);
+}
+
+function calculateOrderIncomeSummaries(orders) {
+    let totalIncome = 0;
+    let currentMonthIncome = 0;
+  
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+  
+    orders.forEach(order => {
+      const price = parseFloat(order.price) || 0;
+      totalIncome += price;
+  
+      const orderDate = order.paymentReceivedDate?.toDate?.() || new Date(order.paymentReceivedDate);
+      if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
+        currentMonthIncome += price;
+      }
+    });
+  
+    document.getElementById("totalOrderIncome").textContent = totalIncome.toFixed(2);
+    document.getElementById("currentMonthOrderIncome").textContent = currentMonthIncome.toFixed(2);
+}
+  
+  

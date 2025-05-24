@@ -61,6 +61,7 @@ function renderExpenseTable(expense) {
     });
 
     toggleDeleteButton();
+    calculateExpenseSummaries(expense);
 }
 
 // Function to save the changes to Firestore
@@ -445,4 +446,26 @@ function populateItems() {
       itemSelect.appendChild(option);
     });
   }
+}
+
+function calculateExpenseSummaries(expenses) {
+  let total = 0;
+  let currentMonthTotal = 0;
+
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  expenses.forEach(exp => {
+    const amount = parseFloat(exp.amount) || 0;
+    total += amount;
+
+    const dateObj = exp.purchaseDate.toDate?.() || new Date(exp.purchaseDate);
+    if (dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear) {
+      currentMonthTotal += amount;
+    }
+  });
+
+  document.getElementById("totalExpenseAmount").textContent = total.toFixed(2);
+  document.getElementById("currentMonthExpenseAmount").textContent = currentMonthTotal.toFixed(2);
 }

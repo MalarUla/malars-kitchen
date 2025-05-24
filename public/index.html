@@ -272,7 +272,11 @@
         <div class="left-actions">
           <button id="newExpenseButton" onclick="openAddExpensePopup()">Add Expense</button>
           <button id="saveButton" disabled onclick="saveExpenses()">Save</button>
-          <button id="deleteExpenseButton" disabled onclick="confirmDeleteExpenses()">Delete Expense</button>
+          <button id="deleteExpenseButton" disabled onclick="confirmDeleteExpenses()">Delete Expense</button>       
+        </div>
+        <div class="expense-summary-wrapper" style="display: inline-flex; gap: 20px; margin-left: 30px; align-items: center;">
+          <span class="expense-summary"><strong>Total Expense:</strong> $<span id="totalExpenseAmount">0.00</span></span>
+          <span class="expense-summary"><strong>Current Month:</strong> $<span id="currentMonthExpenseAmount">0.00</span></span>
         </div>
         <div class="right-actions">
           <button id="exportCSVBtn">Export CSV</button>
@@ -407,6 +411,10 @@
           <button id="newOrderBtn" class="orders-btn" onclick="openAddOrderPopup()">New Order</button>
           <button id="updateOrderBtn" class="orders-btn" onclick="openUpdateOrderPopup()">Update Order</button>
         </div>
+        <div class="order-summary-labels" style="margin-left: 20px;">
+          <span><strong>Total Income:</strong> $<span id="totalOrderIncome">0.00</span></span>&nbsp;&nbsp;
+          <span><strong>Current Month:</strong> $<span id="currentMonthOrderIncome">0.00</span></span>
+        </div>
         <div class="right-order-actions">
           <button id="exportCSVBtn" class="orders-btn" onclick="exportOrdersToCSV()">Export to CSV</button>
           <button id="refreshGoogleSheetBtn" class="orders-btn" onclick="refreshOrdersGoogleSheet()">Refresh Google Sheet</button>
@@ -443,6 +451,11 @@
                 <option value="">Select</option>
               </select>
             </div>
+
+            <div class="form-group">
+              <label for="modalDiscountPrice">Discount Applied?</label><input type="checkbox" id="modalDiscountCheckbox" onchange="toggleDiscount(this)">
+                <input type="number" id="modalDiscountPriceInput" placeholder="Discount Price" min="0" step="0.01" style="display:none; margin-top: 5px;" onchange="calculatePrice(document.getElementById('modalFoodItem'))">
+            </div>            
 
             <div class="form-group">
               <label for="modalQuantity">Quantity*</label>
@@ -504,6 +517,11 @@
             </div>
 
             <div class="form-group">
+              <label for="updateDiscountPrice">Discount Applied?</label><input type="checkbox" id="updateDiscountCheckbox" onchange="toggleDiscount(this)">
+                <input type="number" id="updateDiscountPriceInput" placeholder="Discount Price" min="0" step="0.01" style="display:none; margin-top: 5px;" onchange="calculatePrice(document.getElementById('updateFoodItem'))">
+            </div>
+
+            <div class="form-group">
               <label for="updateQuantity">Quantity*</label>
               <input type="number" id="updateQuantity" value="1" min="1" onchange="calculatePrice(document.getElementById('updateFoodItem'))" required>
             </div>
@@ -553,6 +571,8 @@
                 <th data-key="paymentReference">Payment Reference <span class="orders-sort-arrow"></span></th>
                 <th data-key="comments">Suggestions/Instructions <span class="orders-sort-arrow"></span></th>
                 <th data-key="additionalDetails">Additional Details <span class="orders-sort-arrow"></span></th>
+                <th data-key="discount">Discount<span class="orders-sort-arrow"></span></th>
+                <th data-key="discountPrice">Discount Price<span class="orders-sort-arrow"></span></th>
               </tr>
             </thead>
             <tbody id="ordersManagementTableBody">
